@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GitHub Music Player</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      background: radial-gradient(circle at top, #2b2145, #09070f 70%);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+    }
+
+    .player {
+      width: 100%;
+      max-width: 520px;
+      background: rgba(255, 255, 255, 0.09);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(16px);
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+    }
+
+    .subtitle {
+      margin: 0 0 24px;
+      color: #cfc8e8;
+      font-size: 14px;
+    }
+
+    .cover {
+      width: 170px;
+      height: 170px;
+      border-radius: 24px;
+      margin: 0 auto 22px;
+      background: linear-gradient(135deg, #8d5cff, #ff6ec7, #ffe066);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 64px;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35);
+    }
+
+    .track-title {
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 6px;
+      word-break: break-word;
+    }
+
+    .track-link {
+      text-align: center;
+      margin-bottom: 18px;
+      font-size: 13px;
+    }
+
+    .track-link a {
+      color: #d9c7ff;
+    }
+
+    audio {
+      width: 100%;
+      margin-bottom: 16px;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    button {
+      border: none;
+      border-radius: 14px;
+      padding: 12px 10px;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+      font-size: 16px;
+      transition: transform 0.15s ease, background 0.15s ease;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      background: rgba(255, 255, 255, 0.24);
+    }
+
+    .playlist {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      max-height: 260px;
+      overflow: auto;
+      border-radius: 16px;
+    }
+
+    .playlist li {
+      padding: 12px 14px;
+      margin-bottom: 8px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.08);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .playlist li.active {
+      background: rgba(180, 137, 255, 0.35);
+      outline: 1px solid rgba(255, 255, 255, 0.24);
+    }
+
+    .status {
+      margin-top: 14px;
+      font-size: 13px;
+      color: #d7d0eb;
+      line-height: 1.4;
+    }
+
+    .setup {
+      margin-top: 18px;
+      font-size: 13px;
+      color: #cfc8e8;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 14px;
+      padding: 12px;
+      line-height: 1.5;
+    }
+
+    code {
+      color: #ffe9a8;
+    }
+  </style>
+</head>
+<body>
+  <main class="player">
+    <h1>GitHub Music Player</h1>
+    <p class="subtitle">Loads public audio files from a GitHub repository folder.</p>
+
+    <div class="cover">♫</div>
+
+    <div class="track-title" id="trackTitle">Loading playlist...</div>
+    <div class="track-link" id="trackLink"></div>
+
+    <audio id="audio" controls></audio>
+
+    <div class="buttons">
+      <button id="prevBtn" title="Previous">⏮</button>
+      <button id="playBtn" title="Play/Pause">▶️</button>
+      <button id="nextBtn" title="Next">⏭</button>
+      <button id="shuffleBtn" title="Shuffle">🔀</button>
+    </div>
+
+    <ul class="playlist" id="playlist"></ul>
+
+    <div class="status" id="status"></div>
+
+    <div class="setup">
+      <strong>Setup:</strong><br />
+      Change <code>GITHUB_OWNER</code>, <code>GITHUB_REPO</code>, <code>BRANCH</code>, and <code>MUSIC_FOLDER</code> in the script.
+      Your repo must be public, and your files should be MP3, WAV, OGG, FLAC, AAC, or M4A.
+    </div>
+  </main>
+
+  <script>
+    // ==========================
+    // EDIT THESE SETTINGS
+    // ==========================
+    const GITHUB_OWNER = "your-username";
+    const GITHUB_REPO = "your-repo-name";
+    const BRANCH = "main";
+    const MUSIC_FOLDER = "music"; // Example: "music" or "assets/audio"
+
+    const AUDIO_EXTENSIONS = [".mp3", ".wav", ".ogg", ".flac", ".aac", ".m4a"];
+
+    const audio = document.getElementById("audio");
+    const playlistEl = document.getElementById("playlist");
+    const trackTitle = document.getElementById("trackTitle");
+    const trackLink = document.getElementById("trackLink");
+    const statusEl = document.getElementById("status");
+
+    const prevBtn = document.getElementById("prevBtn");
+    const playBtn = document.getElementById("playBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const shuffleBtn = document.getElementById("shuffleBtn");
+
+    let tracks = [];
+    let currentTrackIndex = 0;
+
+    function cleanFileName(name) {
+      return decodeURIComponent(name)
+        .replace(/\.[^/.]+$/, "")
+        .replace(/[-_]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    function isAudioFile(filename) {
+      const lower = filename.toLowerCase();
+      return AUDIO_EXTENSIONS.some(ext => lower.endsWith(ext));
+    }
+
+    function githubApiUrl() {
+      return `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${MUSIC_FOLDER}?ref=${BRANCH}`;
+    }
+
+    function rawGithubUrl(filename) {
+      const encodedFolder = MUSIC_FOLDER.split("/").map(encodeURIComponent).join("/");
+      const encodedFile = encodeURIComponent(filename);
+      return `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${BRANCH}/${encodedFolder}/${encodedFile}`;
+    }
+
+    async function loadPlaylistFromGitHub() {
+      try {
+        statusEl.textContent = "Fetching music files from GitHub...";
+
+        const response = await fetch(githubApiUrl());
+
+        if (!response.ok) {
+          throw new Error(`GitHub request failed: ${response.status} ${response.statusText}`);
+        }
+
+        const files = await response.json();
+
+        tracks = files
+          .filter(file => file.type === "file" && isAudioFile(file.name))
+          .map(file => ({
+            title: cleanFileName(file.name),
+            filename: file.name,
+            url: rawGithubUrl(file.name),
+            githubPage: file.html_url
+          }));
+
+        if (tracks.length === 0) {
+          trackTitle.textContent = "No audio files found";
+          statusEl.textContent = "Check that your repo/folder is public and contains supported audio files.";
+          return;
+        }
+
+        renderPlaylist();
+        loadTrack(0);
+        statusEl.textContent = `${tracks.length} track(s) loaded.`;
+      } catch (error) {
+        console.error(error);
+        trackTitle.textContent = "Could not load playlist";
+        statusEl.textContent = "Make sure your GitHub owner, repo, branch, and folder settings are correct. The repo must be public.";
+      }
+    }
+
+    function renderPlaylist() {
+      playlistEl.innerHTML = "";
+
+      tracks.forEach((track, index) => {
+        const li = document.createElement("li");
+        li.innerHTML = `<span>${track.title}</span><span>▶</span>`;
+        li.addEventListener("click", () => {
+          loadTrack(index);
+          playTrack();
+        });
+        playlistEl.appendChild(li);
+      });
+
+      updateActivePlaylistItem();
+    }
+
+    function updateActivePlaylistItem() {
+      [...playlistEl.children].forEach((item, index) => {
+        item.classList.toggle("active", index === currentTrackIndex);
+      });
+    }
+
+    function loadTrack(index) {
+      if (!tracks.length) return;
+
+      currentTrackIndex = (index + tracks.length) % tracks.length;
+      const track = tracks[currentTrackIndex];
+
+      audio.src = track.url;
+      trackTitle.textContent = track.title;
+      trackLink.innerHTML = `<a href="${track.githubPage}" target="_blank" rel="noopener">View file on GitHub</a>`;
+      updateActivePlaylistItem();
+    }
+
+    function playTrack() {
+      audio.play().then(() => {
+        playBtn.textContent = "⏸";
+      }).catch(error => {
+        console.warn("Playback blocked or failed:", error);
+        statusEl.textContent = "Press play again if your browser blocked autoplay.";
+      });
+    }
+
+    function pauseTrack() {
+      audio.pause();
+      playBtn.textContent = "▶️";
+    }
+
+    function togglePlay() {
+      if (!audio.src) return;
+      if (audio.paused) {
+        playTrack();
+      } else {
+        pauseTrack();
+      }
+    }
+
+    function nextTrack() {
+      loadTrack(currentTrackIndex + 1);
+      playTrack();
+    }
+
+    function previousTrack() {
+      loadTrack(currentTrackIndex - 1);
+      playTrack();
+    }
+
+    function shuffleTrack() {
+      if (tracks.length < 2) return;
+
+      let randomIndex;
+      do {
+        randomIndex = Math.floor(Math.random() * tracks.length);
+      } while (randomIndex === currentTrackIndex);
+
+      loadTrack(randomIndex);
+      playTrack();
+    }
+
+    playBtn.addEventListener("click", togglePlay);
+    nextBtn.addEventListener("click", nextTrack);
+    prevBtn.addEventListener("click", previousTrack);
+    shuffleBtn.addEventListener("click", shuffleTrack);
+
+    audio.addEventListener("ended", nextTrack);
+    audio.addEventListener("pause", () => playBtn.textContent = "▶️");
+    audio.addEventListener("play", () => playBtn.textContent = "⏸");
+
+    loadPlaylistFromGitHub();
+  </script>
+</body>
+</html>
