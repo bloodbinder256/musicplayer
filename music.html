@@ -3,207 +3,625 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GitHub Music Player</title>
+  <title>GitHub Music Player Pro</title>
+
+  <!-- Libraries -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
   <style>
     * {
       box-sizing: border-box;
     }
 
+    :root {
+      --bg: #080712;
+      --panel: rgba(255, 255, 255, 0.1);
+      --panel-strong: rgba(255, 255, 255, 0.16);
+      --text: #ffffff;
+      --muted: #cfc8e8;
+      --accent: #a77cff;
+      --accent-2: #ff6ec7;
+      --danger: #ff6b8b;
+      --success: #78f0c4;
+      --shadow: rgba(0, 0, 0, 0.45);
+    }
+
+    body.light {
+      --bg: #f4f0ff;
+      --panel: rgba(255, 255, 255, 0.72);
+      --panel-strong: rgba(255, 255, 255, 0.96);
+      --text: #1b142d;
+      --muted: #5e5278;
+      --accent: #7b3fff;
+      --accent-2: #d92b9f;
+      --shadow: rgba(57, 32, 92, 0.18);
+    }
+
     body {
       margin: 0;
       min-height: 100vh;
-      font-family: Arial, sans-serif;
-      background: radial-gradient(circle at top, #2b2145, #09070f 70%);
-      color: white;
+      font-family: Inter, Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(167, 124, 255, 0.38), transparent 34%),
+        radial-gradient(circle at bottom right, rgba(255, 110, 199, 0.26), transparent 34%),
+        var(--bg);
       display: flex;
       justify-content: center;
-      align-items: center;
+      align-items: stretch;
       padding: 24px;
+    }
+
+    .app {
+      width: min(1150px, 100%);
+      display: grid;
+      grid-template-columns: 390px 1fr;
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 28px;
+      box-shadow: 0 24px 70px var(--shadow);
+      backdrop-filter: blur(18px);
     }
 
     .player {
-      width: 100%;
-      max-width: 520px;
-      background: rgba(255, 255, 255, 0.09);
-      border: 1px solid rgba(255, 255, 255, 0.16);
-      border-radius: 24px;
       padding: 24px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
-      backdrop-filter: blur(16px);
+      display: flex;
+      flex-direction: column;
+      min-height: 680px;
+    }
+
+    .library {
+      padding: 20px;
+      min-height: 680px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 22px;
     }
 
     h1 {
-      margin: 0 0 8px;
+      margin: 0;
       font-size: 28px;
+      line-height: 1;
+      letter-spacing: -0.04em;
     }
 
     .subtitle {
-      margin: 0 0 24px;
-      color: #cfc8e8;
-      font-size: 14px;
+      color: var(--muted);
+      margin-top: 6px;
+      font-size: 13px;
+    }
+
+    .icon-button,
+    button {
+      border: none;
+      border-radius: 16px;
+      cursor: pointer;
+      background: var(--panel-strong);
+      color: var(--text);
+      transition: transform 0.15s ease, background 0.15s ease, opacity 0.15s ease;
+    }
+
+    .icon-button:hover,
+    button:hover {
+      transform: translateY(-2px);
+      opacity: 0.95;
+    }
+
+    .icon-button {
+      width: 44px;
+      height: 44px;
+      font-size: 17px;
+    }
+
+    .cover-wrap {
+      display: flex;
+      justify-content: center;
+      margin: 14px 0 24px;
     }
 
     .cover {
-      width: 170px;
-      height: 170px;
-      border-radius: 24px;
-      margin: 0 auto 22px;
-      background: linear-gradient(135deg, #8d5cff, #ff6ec7, #ffe066);
+      width: 230px;
+      height: 230px;
+      border-radius: 36px;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.3), transparent),
+        linear-gradient(135deg, var(--accent), var(--accent-2), #ffe066);
+      box-shadow: 0 22px 55px var(--shadow);
       display: flex;
       justify-content: center;
       align-items: center;
-      font-size: 64px;
-      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cover::before {
+      content: "";
+      width: 86px;
+      height: 86px;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.24);
+      border: 14px solid rgba(255,255,255,0.18);
+      position: absolute;
+    }
+
+    .cover i {
+      position: relative;
+      font-size: 54px;
+      text-shadow: 0 8px 24px rgba(0,0,0,0.28);
+    }
+
+    .cover.playing {
+      animation: pulse 2.6s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.025); }
     }
 
     .track-title {
       text-align: center;
-      font-size: 20px;
-      font-weight: bold;
-      margin-bottom: 6px;
+      font-size: 24px;
+      line-height: 1.2;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      margin-bottom: 8px;
       word-break: break-word;
     }
 
-    .track-link {
+    .track-meta {
       text-align: center;
-      margin-bottom: 18px;
       font-size: 13px;
-    }
-
-    .track-link a {
-      color: #d9c7ff;
-    }
-
-    audio {
-      width: 100%;
-      margin-bottom: 16px;
-    }
-
-    .buttons {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
+      color: var(--muted);
       margin-bottom: 18px;
+      word-break: break-word;
     }
 
-    button {
-      border: none;
-      border-radius: 14px;
-      padding: 12px 10px;
+    .track-meta a {
+      color: var(--muted);
+    }
+
+    .progress-area {
+      margin: 6px 0 18px;
+    }
+
+    .time-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
       cursor: pointer;
-      background: rgba(255, 255, 255, 0.15);
-      color: white;
-      font-size: 16px;
-      transition: transform 0.15s ease, background 0.15s ease;
     }
 
-    button:hover {
-      transform: translateY(-2px);
-      background: rgba(255, 255, 255, 0.24);
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      margin: 16px 0;
+    }
+
+    .controls button {
+      height: 50px;
+      font-size: 17px;
+    }
+
+    .controls .main-play {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      font-size: 20px;
+    }
+
+    .volume-row {
+      display: grid;
+      grid-template-columns: 24px 1fr 48px;
+      gap: 10px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 14px;
+    }
+
+    .tools {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: auto;
+    }
+
+    .tools button,
+    .small-button {
+      padding: 12px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .library-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .library-header h2 {
+      margin: 0;
+      font-size: 24px;
+      letter-spacing: -0.04em;
+    }
+
+    .search-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .search-row input,
+    .rename-panel input,
+    .settings-panel input {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,0.14);
+      outline: none;
+      border-radius: 16px;
+      padding: 13px 14px;
+      color: var(--text);
+      background: var(--panel-strong);
+      font: inherit;
     }
 
     .playlist {
       list-style: none;
       padding: 0;
       margin: 0;
-      max-height: 260px;
       overflow: auto;
-      border-radius: 16px;
+      flex: 1;
+      padding-right: 4px;
     }
 
-    .playlist li {
-      padding: 12px 14px;
-      margin-bottom: 8px;
-      border-radius: 14px;
-      background: rgba(255, 255, 255, 0.08);
-      cursor: pointer;
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
+    .song {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
       align-items: center;
+      gap: 12px;
+      padding: 13px;
+      margin-bottom: 10px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.075);
+      cursor: pointer;
+      border: 1px solid transparent;
     }
 
-    .playlist li.active {
-      background: rgba(180, 137, 255, 0.35);
-      outline: 1px solid rgba(255, 255, 255, 0.24);
+    .song:hover {
+      background: rgba(255, 255, 255, 0.13);
+    }
+
+    .song.active {
+      border-color: rgba(255,255,255,0.26);
+      background: linear-gradient(135deg, rgba(167, 124, 255, 0.34), rgba(255, 110, 199, 0.18));
+    }
+
+    .song-number {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--panel-strong);
+      border-radius: 12px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .song-title {
+      font-weight: 800;
+      font-size: 14px;
+      word-break: break-word;
+    }
+
+    .song-file {
+      margin-top: 4px;
+      font-size: 12px;
+      color: var(--muted);
+      word-break: break-word;
+    }
+
+    .song-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .song-actions button {
+      width: 36px;
+      height: 36px;
+      border-radius: 13px;
+    }
+
+    .panel {
+      margin-top: 14px;
+      background: rgba(0, 0, 0, 0.18);
+      border-radius: 18px;
+      padding: 14px;
+      display: none;
+    }
+
+    .panel.show {
+      display: block;
+    }
+
+    .panel h3 {
+      margin: 0 0 10px;
+      font-size: 15px;
+    }
+
+    .rename-panel .rename-actions,
+    .settings-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .rename-actions button,
+    .settings-actions button {
+      flex: 1;
+    }
+
+    .danger {
+      color: white;
+      background: rgba(255, 107, 139, 0.28);
     }
 
     .status {
-      margin-top: 14px;
+      margin-top: 12px;
       font-size: 13px;
-      color: #d7d0eb;
-      line-height: 1.4;
+      color: var(--muted);
+      line-height: 1.45;
     }
 
-    .setup {
-      margin-top: 18px;
-      font-size: 13px;
-      color: #cfc8e8;
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: 14px;
-      padding: 12px;
-      line-height: 1.5;
+    .empty {
+      text-align: center;
+      color: var(--muted);
+      padding: 40px 12px;
     }
 
-    code {
-      color: #ffe9a8;
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      transform: translateX(-50%) translateY(30px);
+      opacity: 0;
+      pointer-events: none;
+      background: rgba(0, 0, 0, 0.72);
+      color: white;
+      padding: 12px 16px;
+      border-radius: 999px;
+      transition: all 0.2s ease;
+      font-size: 13px;
+      z-index: 20;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 870px) {
+      body {
+        padding: 14px;
+      }
+
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .player,
+      .library {
+        min-height: auto;
+      }
     }
   </style>
 </head>
 <body>
-  <main class="player">
-    <h1>GitHub Music Player</h1>
-    <p class="subtitle">Loads public audio files from a GitHub repository folder.</p>
+  <main class="app">
+    <section class="player card">
+      <div class="topbar">
+        <div>
+          <h1>Music Player</h1>
+          <div class="subtitle">Powered by public GitHub audio files</div>
+        </div>
+        <button class="icon-button" id="themeBtn" title="Toggle theme">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+      </div>
 
-    <div class="cover">♫</div>
+      <div class="cover-wrap">
+        <div class="cover" id="cover">
+          <i class="fa-solid fa-music"></i>
+        </div>
+      </div>
 
-    <div class="track-title" id="trackTitle">Loading playlist...</div>
-    <div class="track-link" id="trackLink"></div>
+      <div class="track-title" id="trackTitle">Loading playlist...</div>
+      <div class="track-meta" id="trackMeta"></div>
 
-    <audio id="audio" controls></audio>
+      <div class="progress-area">
+        <div class="time-row">
+          <span id="currentTime">0:00</span>
+          <span id="duration">0:00</span>
+        </div>
+        <input id="seekSlider" type="range" min="0" max="100" value="0">
+      </div>
 
-    <div class="buttons">
-      <button id="prevBtn" title="Previous">⏮</button>
-      <button id="playBtn" title="Play/Pause">▶️</button>
-      <button id="nextBtn" title="Next">⏭</button>
-      <button id="shuffleBtn" title="Shuffle">🔀</button>
-    </div>
+      <audio id="audio"></audio>
 
-    <ul class="playlist" id="playlist"></ul>
+      <div class="controls">
+        <button id="repeatBtn" title="Repeat"><i class="fa-solid fa-repeat"></i></button>
+        <button id="prevBtn" title="Previous"><i class="fa-solid fa-backward-step"></i></button>
+        <button id="playBtn" class="main-play" title="Play/Pause"><i class="fa-solid fa-play"></i></button>
+        <button id="nextBtn" title="Next"><i class="fa-solid fa-forward-step"></i></button>
+        <button id="shuffleBtn" title="Shuffle"><i class="fa-solid fa-shuffle"></i></button>
+      </div>
 
-    <div class="status" id="status"></div>
+      <div class="volume-row">
+        <i class="fa-solid fa-volume-low"></i>
+        <input id="volumeSlider" type="range" min="0" max="100" value="85">
+        <span id="volumeText">85%</span>
+      </div>
 
-    <div class="setup">
-      <strong>Setup:</strong><br />
-      Change <code>GITHUB_OWNER</code>, <code>GITHUB_REPO</code>, <code>BRANCH</code>, and <code>MUSIC_FOLDER</code> in the script.
-      Your repo must be public, and your files should be MP3, WAV, OGG, FLAC, AAC, or M4A.
-    </div>
+      <div class="tools">
+        <button id="copyLinkBtn"><i class="fa-solid fa-link"></i> Copy</button>
+        <button id="downloadBtn"><i class="fa-solid fa-download"></i> File</button>
+        <button id="settingsBtn"><i class="fa-solid fa-gear"></i> Setup</button>
+      </div>
+
+      <div class="settings-panel panel" id="settingsPanel">
+        <h3>GitHub settings</h3>
+        <input id="ownerInput" placeholder="GitHub username or organization">
+        <br><br>
+        <input id="repoInput" placeholder="Repository name">
+        <br><br>
+        <input id="branchInput" placeholder="Branch, usually main">
+        <br><br>
+        <input id="folderInput" placeholder="Music folder, example: music">
+        <div class="settings-actions">
+          <button id="saveSettingsBtn">Save & reload</button>
+          <button id="resetSettingsBtn" class="danger">Reset</button>
+        </div>
+      </div>
+
+      <div class="status" id="status"></div>
+    </section>
+
+    <section class="library card">
+      <div class="library-header">
+        <h2>Library</h2>
+        <button class="small-button" id="sortBtn"><i class="fa-solid fa-arrow-down-a-z"></i> Sort</button>
+      </div>
+
+      <div class="search-row">
+        <input id="searchInput" type="search" placeholder="Search songs...">
+        <button class="small-button" id="clearSearchBtn">Clear</button>
+      </div>
+
+      <ul class="playlist" id="playlist"></ul>
+
+      <div class="rename-panel panel" id="renamePanel">
+        <h3>Rename song display title</h3>
+        <input id="renameInput" placeholder="New display name">
+        <div class="rename-actions">
+          <button id="saveRenameBtn">Save name</button>
+          <button id="clearRenameBtn" class="danger">Use file name</button>
+        </div>
+      </div>
+    </section>
   </main>
 
+  <div class="toast" id="toast"></div>
+
   <script>
-    // ==========================
-    // EDIT THESE SETTINGS
-    // ==========================
-    const GITHUB_OWNER = "bloodbinder256";
-    const GITHUB_REPO = "musicplayer";
-    const BRANCH = "main";
-    const MUSIC_FOLDER = "music"; // Example: "music" or "assets/audio"
+    // =====================================================
+    // DEFAULT SETTINGS
+    // You can edit these, or change them in the app Setup box.
+    // =====================================================
+    const DEFAULT_SETTINGS = {
+      owner: "bloodbinder256",
+      repo: "musicplayer",
+      branch: "main",
+      folder: "music"
+    };
 
     const AUDIO_EXTENSIONS = [".mp3", ".wav", ".ogg", ".flac", ".aac", ".m4a"];
+    const STORAGE_KEYS = {
+      settings: "githubMusicPlayerSettings",
+      renames: "githubMusicPlayerRenames",
+      theme: "githubMusicPlayerTheme",
+      volume: "githubMusicPlayerVolume"
+    };
 
     const audio = document.getElementById("audio");
+    const cover = document.getElementById("cover");
     const playlistEl = document.getElementById("playlist");
     const trackTitle = document.getElementById("trackTitle");
-    const trackLink = document.getElementById("trackLink");
+    const trackMeta = document.getElementById("trackMeta");
     const statusEl = document.getElementById("status");
+    const toastEl = document.getElementById("toast");
+
+    const currentTimeEl = document.getElementById("currentTime");
+    const durationEl = document.getElementById("duration");
+    const seekSlider = document.getElementById("seekSlider");
+    const volumeSlider = document.getElementById("volumeSlider");
+    const volumeText = document.getElementById("volumeText");
 
     const prevBtn = document.getElementById("prevBtn");
     const playBtn = document.getElementById("playBtn");
     const nextBtn = document.getElementById("nextBtn");
     const shuffleBtn = document.getElementById("shuffleBtn");
+    const repeatBtn = document.getElementById("repeatBtn");
+    const themeBtn = document.getElementById("themeBtn");
+    const copyLinkBtn = document.getElementById("copyLinkBtn");
+    const downloadBtn = document.getElementById("downloadBtn");
+    const settingsBtn = document.getElementById("settingsBtn");
+    const sortBtn = document.getElementById("sortBtn");
 
+    const searchInput = document.getElementById("searchInput");
+    const clearSearchBtn = document.getElementById("clearSearchBtn");
+    const renamePanel = document.getElementById("renamePanel");
+    const renameInput = document.getElementById("renameInput");
+    const saveRenameBtn = document.getElementById("saveRenameBtn");
+    const clearRenameBtn = document.getElementById("clearRenameBtn");
+
+    const settingsPanel = document.getElementById("settingsPanel");
+    const ownerInput = document.getElementById("ownerInput");
+    const repoInput = document.getElementById("repoInput");
+    const branchInput = document.getElementById("branchInput");
+    const folderInput = document.getElementById("folderInput");
+    const saveSettingsBtn = document.getElementById("saveSettingsBtn");
+    const resetSettingsBtn = document.getElementById("resetSettingsBtn");
+
+    let settings = loadSettings();
+    let renames = loadRenames();
     let tracks = [];
+    let filteredTracks = [];
     let currentTrackIndex = 0;
+    let selectedRenameFilename = null;
+    let isShuffle = false;
+    let isRepeat = false;
+    let sortAscending = true;
+
+    function loadSettings() {
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEYS.settings) || "null");
+      return { ...DEFAULT_SETTINGS, ...(saved || {}) };
+    }
+
+    function saveSettings() {
+      localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(settings));
+    }
+
+    function loadRenames() {
+      return JSON.parse(localStorage.getItem(STORAGE_KEYS.renames) || "{}");
+    }
+
+    function saveRenames() {
+      localStorage.setItem(STORAGE_KEYS.renames, JSON.stringify(renames));
+    }
 
     function cleanFileName(name) {
       return decodeURIComponent(name)
@@ -213,24 +631,45 @@
         .trim();
     }
 
+    function getDisplayTitle(track) {
+      return renames[track.filename] || track.originalTitle;
+    }
+
     function isAudioFile(filename) {
       const lower = filename.toLowerCase();
       return AUDIO_EXTENSIONS.some(ext => lower.endsWith(ext));
     }
 
     function githubApiUrl() {
-      return `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${MUSIC_FOLDER}?ref=${BRANCH}`;
+      const folder = settings.folder.split("/").map(encodeURIComponent).join("/");
+      return `https://api.github.com/repos/${settings.owner}/${settings.repo}/contents/${folder}?ref=${settings.branch}`;
     }
 
     function rawGithubUrl(filename) {
-      const encodedFolder = MUSIC_FOLDER.split("/").map(encodeURIComponent).join("/");
+      const encodedFolder = settings.folder.split("/").map(encodeURIComponent).join("/");
       const encodedFile = encodeURIComponent(filename);
-      return `https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/${BRANCH}/${encodedFolder}/${encodedFile}`;
+      return `https://raw.githubusercontent.com/${settings.owner}/${settings.repo}/${settings.branch}/${encodedFolder}/${encodedFile}`;
+    }
+
+    function formatTime(seconds) {
+      if (!Number.isFinite(seconds)) return "0:00";
+      const mins = Math.floor(seconds / 60);
+      const secs = Math.floor(seconds % 60).toString().padStart(2, "0");
+      return `${mins}:${secs}`;
+    }
+
+    function showToast(message) {
+      toastEl.textContent = message;
+      toastEl.classList.add("show");
+      setTimeout(() => toastEl.classList.remove("show"), 1800);
     }
 
     async function loadPlaylistFromGitHub() {
       try {
         statusEl.textContent = "Fetching music files from GitHub...";
+        trackTitle.textContent = "Loading playlist...";
+        trackMeta.textContent = "";
+        playlistEl.innerHTML = "";
 
         const response = await fetch(githubApiUrl());
 
@@ -243,47 +682,91 @@
         tracks = files
           .filter(file => file.type === "file" && isAudioFile(file.name))
           .map(file => ({
-            title: cleanFileName(file.name),
+            originalTitle: cleanFileName(file.name),
             filename: file.name,
             url: rawGithubUrl(file.name),
-            githubPage: file.html_url
+            githubPage: file.html_url,
+            size: file.size || 0
           }));
 
         if (tracks.length === 0) {
           trackTitle.textContent = "No audio files found";
-          statusEl.textContent = "Check that your repo/folder is public and contains supported audio files.";
+          statusEl.textContent = "Check your repo/folder and make sure it contains MP3, WAV, OGG, FLAC, AAC, or M4A files.";
+          renderPlaylist();
           return;
         }
 
-        renderPlaylist();
+        applySearchAndSort();
         loadTrack(0);
-        statusEl.textContent = `${tracks.length} track(s) loaded.`;
+        statusEl.textContent = `${tracks.length} track(s) loaded from ${settings.owner}/${settings.repo}/${settings.folder}.`;
       } catch (error) {
         console.error(error);
+        tracks = [];
+        filteredTracks = [];
+        renderPlaylist();
         trackTitle.textContent = "Could not load playlist";
-        statusEl.textContent = "Make sure your GitHub owner, repo, branch, and folder settings are correct. The repo must be public.";
+        trackMeta.textContent = "";
+        statusEl.textContent = "Check your GitHub settings. The repo must be public, and the folder/branch names must match exactly.";
       }
+    }
+
+    function applySearchAndSort() {
+      const query = searchInput.value.trim().toLowerCase();
+
+      filteredTracks = tracks.filter(track => {
+        const title = getDisplayTitle(track).toLowerCase();
+        const file = track.filename.toLowerCase();
+        return title.includes(query) || file.includes(query);
+      });
+
+      filteredTracks.sort((a, b) => {
+        const result = getDisplayTitle(a).localeCompare(getDisplayTitle(b));
+        return sortAscending ? result : -result;
+      });
+
+      renderPlaylist();
     }
 
     function renderPlaylist() {
       playlistEl.innerHTML = "";
 
-      tracks.forEach((track, index) => {
+      if (!filteredTracks.length) {
+        playlistEl.innerHTML = `<li class="empty">No songs to show.</li>`;
+        return;
+      }
+
+      filteredTracks.forEach((track, visibleIndex) => {
+        const realIndex = tracks.findIndex(item => item.filename === track.filename);
         const li = document.createElement("li");
-        li.innerHTML = `<span>${track.title}</span><span>▶</span>`;
-        li.addEventListener("click", () => {
-          loadTrack(index);
+        li.className = "song";
+        if (realIndex === currentTrackIndex) li.classList.add("active");
+
+        li.innerHTML = `
+          <div class="song-number">${visibleIndex + 1}</div>
+          <div>
+            <div class="song-title">${getDisplayTitle(track)}</div>
+            <div class="song-file">${track.filename}</div>
+          </div>
+          <div class="song-actions">
+            <button title="Rename display title" data-action="rename"><i class="fa-solid fa-pen"></i></button>
+            <button title="Play" data-action="play"><i class="fa-solid fa-play"></i></button>
+          </div>
+        `;
+
+        li.addEventListener("click", event => {
+          const action = event.target.closest("button")?.dataset.action;
+
+          if (action === "rename") {
+            event.stopPropagation();
+            openRenamePanel(track.filename);
+            return;
+          }
+
+          loadTrack(realIndex);
           playTrack();
         });
+
         playlistEl.appendChild(li);
-      });
-
-      updateActivePlaylistItem();
-    }
-
-    function updateActivePlaylistItem() {
-      [...playlistEl.children].forEach((item, index) => {
-        item.classList.toggle("active", index === currentTrackIndex);
       });
     }
 
@@ -294,35 +777,39 @@
       const track = tracks[currentTrackIndex];
 
       audio.src = track.url;
-      trackTitle.textContent = track.title;
-      trackLink.innerHTML = `<a href="${track.githubPage}" target="_blank" rel="noopener">View file on GitHub</a>`;
-      updateActivePlaylistItem();
+      trackTitle.textContent = getDisplayTitle(track);
+      trackMeta.innerHTML = `${track.filename} • <a href="${track.githubPage}" target="_blank" rel="noopener">View on GitHub</a>`;
+      seekSlider.value = 0;
+      currentTimeEl.textContent = "0:00";
+      durationEl.textContent = "0:00";
+      renderPlaylist();
     }
 
     function playTrack() {
+      if (!audio.src) return;
+
       audio.play().then(() => {
-        playBtn.textContent = "⏸";
-      }).catch(error => {
-        console.warn("Playback blocked or failed:", error);
+        playBtn.innerHTML = `<i class="fa-solid fa-pause"></i>`;
+        cover.classList.add("playing");
+      }).catch(() => {
         statusEl.textContent = "Press play again if your browser blocked autoplay.";
       });
     }
 
     function pauseTrack() {
       audio.pause();
-      playBtn.textContent = "▶️";
+      playBtn.innerHTML = `<i class="fa-solid fa-play"></i>`;
+      cover.classList.remove("playing");
     }
 
     function togglePlay() {
       if (!audio.src) return;
-      if (audio.paused) {
-        playTrack();
-      } else {
-        pauseTrack();
-      }
+      audio.paused ? playTrack() : pauseTrack();
     }
 
     function nextTrack() {
+      if (!tracks.length) return;
+      if (isShuffle) return shuffleTrack();
       loadTrack(currentTrackIndex + 1);
       playTrack();
     }
@@ -334,25 +821,195 @@
 
     function shuffleTrack() {
       if (tracks.length < 2) return;
-
       let randomIndex;
       do {
         randomIndex = Math.floor(Math.random() * tracks.length);
       } while (randomIndex === currentTrackIndex);
-
       loadTrack(randomIndex);
       playTrack();
+    }
+
+    function openRenamePanel(filename) {
+      selectedRenameFilename = filename;
+      const track = tracks.find(item => item.filename === filename);
+      renameInput.value = renames[filename] || track.originalTitle;
+      renamePanel.classList.add("show");
+      renameInput.focus();
+    }
+
+    function saveRename() {
+      if (!selectedRenameFilename) return;
+      const newName = renameInput.value.trim();
+
+      if (!newName) return;
+
+      renames[selectedRenameFilename] = newName;
+      saveRenames();
+      renamePanel.classList.remove("show");
+      applySearchAndSort();
+      loadTrack(currentTrackIndex);
+      showToast("Song display name saved");
+    }
+
+    function clearRename() {
+      if (!selectedRenameFilename) return;
+      delete renames[selectedRenameFilename];
+      saveRenames();
+      renamePanel.classList.remove("show");
+      applySearchAndSort();
+      loadTrack(currentTrackIndex);
+      showToast("Display name reset");
+    }
+
+    function fillSettingsInputs() {
+      ownerInput.value = settings.owner;
+      repoInput.value = settings.repo;
+      branchInput.value = settings.branch;
+      folderInput.value = settings.folder;
+    }
+
+    function saveSettingsFromInputs() {
+      settings = {
+        owner: ownerInput.value.trim() || DEFAULT_SETTINGS.owner,
+        repo: repoInput.value.trim() || DEFAULT_SETTINGS.repo,
+        branch: branchInput.value.trim() || DEFAULT_SETTINGS.branch,
+        folder: folderInput.value.trim() || DEFAULT_SETTINGS.folder
+      };
+
+      saveSettings();
+      settingsPanel.classList.remove("show");
+      showToast("Settings saved");
+      loadPlaylistFromGitHub();
+    }
+
+    function resetSettings() {
+      localStorage.removeItem(STORAGE_KEYS.settings);
+      settings = { ...DEFAULT_SETTINGS };
+      fillSettingsInputs();
+      showToast("Settings reset");
+      loadPlaylistFromGitHub();
+    }
+
+    function applySavedTheme() {
+      const theme = localStorage.getItem(STORAGE_KEYS.theme) || "dark";
+      document.body.classList.toggle("light", theme === "light");
+      themeBtn.innerHTML = theme === "light" ? `<i class="fa-solid fa-sun"></i>` : `<i class="fa-solid fa-moon"></i>`;
+    }
+
+    function toggleTheme() {
+      const isLight = document.body.classList.toggle("light");
+      localStorage.setItem(STORAGE_KEYS.theme, isLight ? "light" : "dark");
+      themeBtn.innerHTML = isLight ? `<i class="fa-solid fa-sun"></i>` : `<i class="fa-solid fa-moon"></i>`;
+    }
+
+    function loadSavedVolume() {
+      const savedVolume = Number(localStorage.getItem(STORAGE_KEYS.volume) || 85);
+      volumeSlider.value = savedVolume;
+      audio.volume = savedVolume / 100;
+      volumeText.textContent = `${savedVolume}%`;
+    }
+
+    function copyCurrentLink() {
+      const track = tracks[currentTrackIndex];
+      if (!track) return;
+      navigator.clipboard.writeText(track.url);
+      showToast("Raw audio link copied");
+    }
+
+    function downloadCurrentFile() {
+      const track = tracks[currentTrackIndex];
+      if (!track) return;
+      window.open(track.url, "_blank", "noopener");
     }
 
     playBtn.addEventListener("click", togglePlay);
     nextBtn.addEventListener("click", nextTrack);
     prevBtn.addEventListener("click", previousTrack);
-    shuffleBtn.addEventListener("click", shuffleTrack);
 
-    audio.addEventListener("ended", nextTrack);
-    audio.addEventListener("pause", () => playBtn.textContent = "▶️");
-    audio.addEventListener("play", () => playBtn.textContent = "⏸");
+    shuffleBtn.addEventListener("click", () => {
+      isShuffle = !isShuffle;
+      shuffleBtn.style.background = isShuffle ? "linear-gradient(135deg, var(--accent), var(--accent-2))" : "var(--panel-strong)";
+      showToast(isShuffle ? "Shuffle on" : "Shuffle off");
+    });
 
+    repeatBtn.addEventListener("click", () => {
+      isRepeat = !isRepeat;
+      audio.loop = isRepeat;
+      repeatBtn.style.background = isRepeat ? "linear-gradient(135deg, var(--accent), var(--accent-2))" : "var(--panel-strong)";
+      showToast(isRepeat ? "Repeat on" : "Repeat off");
+    });
+
+    audio.addEventListener("ended", () => {
+      if (!isRepeat) nextTrack();
+    });
+
+    audio.addEventListener("pause", () => {
+      playBtn.innerHTML = `<i class="fa-solid fa-play"></i>`;
+      cover.classList.remove("playing");
+    });
+
+    audio.addEventListener("play", () => {
+      playBtn.innerHTML = `<i class="fa-solid fa-pause"></i>`;
+      cover.classList.add("playing");
+    });
+
+    audio.addEventListener("loadedmetadata", () => {
+      durationEl.textContent = formatTime(audio.duration);
+    });
+
+    audio.addEventListener("timeupdate", () => {
+      if (!Number.isFinite(audio.duration)) return;
+      seekSlider.value = (audio.currentTime / audio.duration) * 100 || 0;
+      currentTimeEl.textContent = formatTime(audio.currentTime);
+    });
+
+    seekSlider.addEventListener("input", () => {
+      if (!Number.isFinite(audio.duration)) return;
+      audio.currentTime = (seekSlider.value / 100) * audio.duration;
+    });
+
+    volumeSlider.addEventListener("input", () => {
+      const volume = Number(volumeSlider.value);
+      audio.volume = volume / 100;
+      volumeText.textContent = `${volume}%`;
+      localStorage.setItem(STORAGE_KEYS.volume, volume);
+    });
+
+    themeBtn.addEventListener("click", toggleTheme);
+    copyLinkBtn.addEventListener("click", copyCurrentLink);
+    downloadBtn.addEventListener("click", downloadCurrentFile);
+
+    settingsBtn.addEventListener("click", () => {
+      fillSettingsInputs();
+      settingsPanel.classList.toggle("show");
+    });
+
+    saveSettingsBtn.addEventListener("click", saveSettingsFromInputs);
+    resetSettingsBtn.addEventListener("click", resetSettings);
+
+    searchInput.addEventListener("input", applySearchAndSort);
+    clearSearchBtn.addEventListener("click", () => {
+      searchInput.value = "";
+      applySearchAndSort();
+    });
+
+    sortBtn.addEventListener("click", () => {
+      sortAscending = !sortAscending;
+      sortBtn.innerHTML = sortAscending
+        ? `<i class="fa-solid fa-arrow-down-a-z"></i> Sort`
+        : `<i class="fa-solid fa-arrow-up-z-a"></i> Sort`;
+      applySearchAndSort();
+    });
+
+    saveRenameBtn.addEventListener("click", saveRename);
+    clearRenameBtn.addEventListener("click", clearRename);
+    renameInput.addEventListener("keydown", event => {
+      if (event.key === "Enter") saveRename();
+    });
+
+    applySavedTheme();
+    loadSavedVolume();
+    fillSettingsInputs();
     loadPlaylistFromGitHub();
   </script>
 </body>
