@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Fayelist - Music Player</title>
 
-  <!-- Libraries -->
+  <!-- Libraries & Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Inter:wght@400;500;700;900&family=Poppins:wght@400;500;700;900&family=Roboto:wght@400;500;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
   <style>
@@ -28,9 +28,30 @@
       --accent-hover: #1db954;
       --danger: #e91429;
       --shadow: rgba(0, 0, 0, 0.6);
+      --card-radius: 8px;
+      --app-font: 'Inter', sans-serif;
     }
 
-    body.light {
+    /* Theme Variants */
+    body.theme-slate {
+      --bg: #0f172a;
+      --sidebar: #1e293b;
+      --panel: #334155;
+      --panel-hover: #475569;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+    }
+
+    body.theme-navy {
+      --bg: #0b0f19;
+      --sidebar: #111827;
+      --panel: #1f2937;
+      --panel-hover: #374151;
+      --text: #f9fafb;
+      --muted: #9ca3af;
+    }
+
+    body.theme-light {
       --bg: #f8f9fa;
       --sidebar: #ffffff;
       --panel: #f1f3f5;
@@ -38,20 +59,19 @@
       --text: #121212;
       --muted: #6c757d;
       --accent: #1db954;
-      --accent-hover: #1aa34a;
-      --danger: #dc3545;
       --shadow: rgba(0, 0, 0, 0.1);
     }
 
     body {
       margin: 0;
       height: 100vh;
-      font-family: Inter, Arial, sans-serif;
+      font-family: var(--app-font);
       color: var(--text);
       background: var(--bg);
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      transition: background 0.3s, color 0.3s;
     }
 
     .app-layout {
@@ -111,6 +131,7 @@
       align-items: center;
       gap: 16px;
       text-align: left;
+      font-family: inherit;
       transition: color 0.2s, background 0.2s;
     }
 
@@ -229,6 +250,7 @@
       border-radius: 500px;
       font-weight: 700;
       font-size: 13px;
+      font-family: inherit;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -266,7 +288,7 @@
     .song-card {
       background: var(--panel);
       padding: 16px;
-      border-radius: 8px;
+      border-radius: var(--card-radius);
       cursor: pointer;
       display: flex;
       flex-direction: column;
@@ -286,7 +308,7 @@
     .card-cover {
       width: 100%;
       aspect-ratio: 1;
-      border-radius: 6px;
+      border-radius: calc(var(--card-radius) - 2px);
       background: linear-gradient(135deg, #333, #111);
       display: flex;
       justify-content: center;
@@ -349,7 +371,7 @@
       grid-template-columns: 40px 1fr 1fr auto;
       align-items: center;
       padding: 10px 16px;
-      border-radius: 6px;
+      border-radius: var(--card-radius);
       background: transparent;
       cursor: pointer;
       gap: 12px;
@@ -512,6 +534,7 @@
       border-radius: 4px;
       font-size: 12px;
       cursor: pointer;
+      font-family: inherit;
     }
 
     /* Modals */
@@ -543,6 +566,13 @@
       font-size: 18px;
     }
 
+    .panel-modal label {
+      font-size: 13px;
+      color: var(--muted);
+      display: block;
+      margin: 12px 0 6px;
+    }
+
     .panel-modal input, .panel-modal select, .panel-modal textarea {
       width: 100%;
       background: #121212;
@@ -551,16 +581,34 @@
       border-radius: 6px;
       color: var(--text);
       font: inherit;
-      margin-bottom: 12px;
       outline: none;
       resize: vertical;
+    }
+
+    .accent-presets {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .color-swatch {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+
+    .color-swatch:hover {
+      transform: scale(1.1);
     }
 
     .modal-actions {
       display: flex;
       gap: 10px;
       justify-content: flex-end;
-      margin-top: 16px;
+      margin-top: 20px;
       flex-wrap: wrap;
     }
 
@@ -612,6 +660,7 @@
       align-items: center;
       gap: 4px;
       cursor: pointer;
+      font-family: inherit;
     }
 
     .mobile-nav-btn i {
@@ -663,10 +712,9 @@
       <div class="custom-playlists" id="customPlaylistsContainer"></div>
 
       <div class="sidebar-section">
-        <button class="nav-item" id="sidebarCustomizeBtn"><i class="fa-solid fa-palette"></i> Customization</button>
+        <button class="nav-item" id="sidebarCustomizeBtn"><i class="fa-solid fa-palette"></i> Customization Options</button>
         <button class="nav-item" id="sidebarSyncBtn"><i class="fa-solid fa-qrcode"></i> Device Sync Code</button>
         <button class="nav-item" id="sidebarSettingsBtn"><i class="fa-solid fa-gear"></i> GitHub Setup</button>
-        <button class="nav-item" id="sidebarThemeBtn"><i class="fa-solid fa-circle-half-stroke"></i> Toggle Theme</button>
       </div>
     </aside>
 
@@ -736,7 +784,53 @@
     </footer>
   </main>
 
-  <!-- Modals -->
+  <!-- Expanded Customization Modal -->
+  <div class="panel-modal" id="customizeModal">
+    <h3 style="margin-bottom:8px;">Customization Options</h3>
+
+    <label>Background Theme</label>
+    <select id="bgThemeSelect">
+      <option value="dark">Pitch Black (Default)</option>
+      <option value="theme-slate">Dark Slate</option>
+      <option value="theme-navy">Deep Navy</option>
+      <option value="theme-light">Light Mode</option>
+    </select>
+
+    <label>Font Family</label>
+    <select id="fontSelect">
+      <option value="'Inter', sans-serif">Inter (Modern Sans)</option>
+      <option value="'Roboto', sans-serif">Roboto (Clean)</option>
+      <option value="'Poppins', sans-serif">Poppins (Rounded)</option>
+      <option value="'Courier Prime', monospace">Courier Prime (Retro Mono)</option>
+    </select>
+
+    <label>Card Corner Style</label>
+    <select id="cardCornerSelect">
+      <option value="8px">Rounded Corners (8px)</option>
+      <option value="16px">Extra Smooth (16px)</option>
+      <option value="0px">Sharp Edges (0px)</option>
+    </select>
+
+    <label>Accent Preset Palette</label>
+    <div class="accent-presets">
+      <div class="color-swatch" style="background:#1ed760;" onclick="setPresetAccent('#1ed760')"></div>
+      <div class="color-swatch" style="background:#00d2ff;" onclick="setPresetAccent('#00d2ff')"></div>
+      <div class="color-swatch" style="background:#a855f7;" onclick="setPresetAccent('#a855f7')"></div>
+      <div class="color-swatch" style="background:#ff2a85;" onclick="setPresetAccent('#ff2a85')"></div>
+      <div class="color-swatch" style="background:#ff8c00;" onclick="setPresetAccent('#ff8c00')"></div>
+    </div>
+
+    <label>Custom Accent Color</label>
+    <input type="color" id="accentColorPicker" value="#1ed760" style="height: 40px; padding: 2px; cursor: pointer;">
+
+    <div class="modal-actions">
+      <button class="btn" id="resetCustomizeBtn">Reset All Defaults</button>
+      <button class="btn btn-accent" id="saveCustomizeBtn">Save Customizations</button>
+      <button class="btn" id="closeCustomizeBtn">Close</button>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
   <div class="panel-modal" id="settingsModal">
     <h3>GitHub Repository Settings</h3>
     <input id="ownerInput" placeholder="GitHub username">
@@ -749,17 +843,7 @@
     </div>
   </div>
 
-  <div class="panel-modal" id="customizeModal">
-    <h3>Theme Customization</h3>
-    <label style="font-size: 13px; color: var(--muted); display: block; margin-bottom: 6px;">Accent Color</label>
-    <input type="color" id="accentColorPicker" value="#1ed760" style="height: 44px; padding: 4px; cursor: pointer;">
-    <div class="modal-actions">
-      <button class="btn" id="resetCustomizeBtn">Reset Default</button>
-      <button class="btn btn-accent" id="saveCustomizeBtn">Save Changes</button>
-      <button class="btn" id="closeCustomizeBtn">Close</button>
-    </div>
-  </div>
-
+  <!-- Sync Modal -->
   <div class="panel-modal" id="syncModal">
     <h3>Transfer & Manage Data</h3>
     <p style="color:var(--muted); font-size:13px; margin-top:0;">Export/import your sync code or clear local storage cache.</p>
@@ -772,6 +856,7 @@
     </div>
   </div>
 
+  <!-- Playlists Modals -->
   <div class="panel-modal" id="playlistModal">
     <h3>Create New Playlist</h3>
     <input id="playlistNameInput" placeholder="Playlist name">
@@ -809,7 +894,9 @@
       volume: "fayelistVolume",
       history: "fayelistHistory",
       playlists: "fayelistCustomPlaylists",
-      accent: "fayelistAccentColor"
+      accent: "fayelistAccentColor",
+      font: "fayelistFont",
+      cardRadius: "fayelistCardRadius"
     };
 
     const audio = document.getElementById("audio");
@@ -851,6 +938,9 @@
     const saveCustomizeBtn = document.getElementById("saveCustomizeBtn");
     const resetCustomizeBtn = document.getElementById("resetCustomizeBtn");
     const accentColorPicker = document.getElementById("accentColorPicker");
+    const bgThemeSelect = document.getElementById("bgThemeSelect");
+    const fontSelect = document.getElementById("fontSelect");
+    const cardCornerSelect = document.getElementById("cardCornerSelect");
 
     const syncModal = document.getElementById("syncModal");
     const sidebarSyncBtn = document.getElementById("sidebarSyncBtn");
@@ -873,7 +963,6 @@
     const confirmAddToPlaylistBtn = document.getElementById("confirmAddToPlaylistBtn");
     const targetPlaylistSelect = document.getElementById("targetPlaylistSelect");
 
-    const sidebarThemeBtn = document.getElementById("sidebarThemeBtn");
     const navHome = document.getElementById("navHome");
     const navHistory = document.getElementById("navHistory");
     const navLocal = document.getElementById("navLocal");
@@ -883,7 +972,7 @@
     const mobPlaylistsBtn = document.getElementById("mobPlaylistsBtn");
     const mobHistoryBtn = document.getElementById("mobHistoryBtn");
 
-    // Safe Error-Resistant LocalStorage Parsers
+    // Safe LocalStorage Parsers
     function loadSettings() {
       try {
         const saved = JSON.parse(localStorage.getItem(STORAGE_KEYS.settings) || "null");
@@ -896,31 +985,19 @@
     function saveSettings() { localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(settings)); }
     
     function loadRenames() {
-      try {
-        return JSON.parse(localStorage.getItem(STORAGE_KEYS.renames) || "{}");
-      } catch (e) {
-        localStorage.removeItem(STORAGE_KEYS.renames);
-        return {};
-      }
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.renames) || "{}"); } 
+      catch (e) { return {}; }
     }
     
     function loadHistory() {
-      try {
-        return JSON.parse(localStorage.getItem(STORAGE_KEYS.history) || "[]");
-      } catch (e) {
-        localStorage.removeItem(STORAGE_KEYS.history);
-        return [];
-      }
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.history) || "[]"); } 
+      catch (e) { return []; }
     }
     function saveHistory() { localStorage.setItem(STORAGE_KEYS.history, JSON.stringify(historyList)); }
     
     function loadPlaylists() {
-      try {
-        return JSON.parse(localStorage.getItem(STORAGE_KEYS.playlists) || "{}");
-      } catch (e) {
-        localStorage.removeItem(STORAGE_KEYS.playlists);
-        return {};
-      }
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEYS.playlists) || "{}"); } 
+      catch (e) { return {}; }
     }
     function savePlaylists() { localStorage.setItem(STORAGE_KEYS.playlists, JSON.stringify(customPlaylists)); renderCustomPlaylistsNav(); }
 
@@ -968,10 +1045,9 @@
       setTimeout(() => toastEl.classList.remove("show"), 1800);
     }
 
-    // No Internet / Offline Handler & GitHub Loader
     async function loadPlaylistFromGitHub() {
       if (!navigator.onLine) {
-        renderOfflineScreen("No internet connection detected. You can still play local dropped files or review your offline history!");
+        renderOfflineScreen("No internet connection detected.");
         return;
       }
 
@@ -992,7 +1068,7 @@
         showToast(`${tracks.length} tracks loaded successfully`);
       } catch (error) {
         console.error(error);
-        renderOfflineScreen("Could not reach GitHub repository. Check your connection or repository settings.");
+        renderOfflineScreen("Could not reach GitHub repository.");
       }
     }
 
@@ -1006,14 +1082,6 @@
         </div>
       `;
     }
-
-    window.addEventListener('online', () => {
-      showToast("Back online! Refreshing tracks...");
-      loadPlaylistFromGitHub();
-    });
-    window.addEventListener('offline', () => {
-      renderOfflineScreen("You have gone offline. Check local files or playlists.");
-    });
 
     function renderCustomPlaylistsNav() {
       customPlaylistsContainer.innerHTML = "";
@@ -1157,26 +1225,12 @@
         saveHistory();
       }
 
-      if ('mediaSession' in navigator) {
-        navigator.mediaSession.metadata = new MediaMetadata({
-          title: getDisplayTitle(track),
-          artist: settings.owner,
-          album: settings.repo
-        });
-        navigator.mediaSession.setActionHandler('play', playTrack);
-        navigator.mediaSession.setActionHandler('pause', pauseTrack);
-        navigator.mediaSession.setActionHandler('previoustrack', previousTrack);
-        navigator.mediaSession.setActionHandler('nexttrack', nextTrack);
-      }
-
       renderContent();
     }
 
     function playTrack() {
       if (!audio.src) return;
-      audio.play().then(() => {
-        playBtn.innerHTML = `<i class="fa-solid fa-pause"></i>`;
-      }).catch(() => showToast("Tap play again to enable audio"));
+      audio.play().then(() => { playBtn.innerHTML = `<i class="fa-solid fa-pause"></i>`; });
     }
 
     function pauseTrack() {
@@ -1191,11 +1245,7 @@
 
     function nextTrack() {
       if (!tracks.length) return;
-      if (isShuffle) {
-        loadTrack(Math.floor(Math.random() * tracks.length));
-      } else {
-        loadTrack(currentTrackIndex + 1);
-      }
+      loadTrack(isShuffle ? Math.floor(Math.random() * tracks.length) : currentTrackIndex + 1);
       playTrack();
     }
 
@@ -1221,15 +1271,12 @@
       addToPlaylistModal.classList.add("show");
     }
 
-    // Local Drag and Drop Support
+    // Drag & Drop
     dropZone.addEventListener("dragover", (e) => e.preventDefault());
     dropZone.addEventListener("drop", (e) => {
       e.preventDefault();
       const files = Array.from(e.dataTransfer.files).filter(file => isAudioFile(file.name));
-      if (files.length === 0) {
-        showToast("No valid audio files found in drop");
-        return;
-      }
+      if (files.length === 0) return;
 
       const newTracks = files.map(file => ({
         originalTitle: cleanFileName(file.name),
@@ -1246,7 +1293,7 @@
       if (audio.src === "") loadTrack(tracks.length - newTracks.length);
     });
 
-    // Event Listeners
+    // Event Handlers
     playBtn.addEventListener("click", togglePlay);
     nextBtn.addEventListener("click", nextTrack);
     prevBtn.addEventListener("click", previousTrack);
@@ -1254,14 +1301,12 @@
     shuffleBtn.addEventListener("click", () => {
       isShuffle = !isShuffle;
       shuffleBtn.classList.toggle("active-state", isShuffle);
-      showToast(isShuffle ? "Shuffle on" : "Shuffle off");
     });
 
     repeatBtn.addEventListener("click", () => {
       isRepeat = !isRepeat;
       audio.loop = isRepeat;
       repeatBtn.classList.toggle("active-state", isRepeat);
-      showToast(isRepeat ? "Repeat on" : "Repeat off");
     });
 
     audio.addEventListener("ended", () => { if (!isRepeat) nextTrack(); });
@@ -1282,22 +1327,7 @@
     volumeSlider.addEventListener("input", () => {
       const vol = Number(volumeSlider.value);
       audio.volume = vol / 100;
-      volumeIcon.className = vol === 0 ? "fa-solid fa-volume-xmark" : vol < 50 ? "fa-solid fa-volume-low" : "fa-solid fa-volume-high";
       localStorage.setItem(STORAGE_KEYS.volume, vol);
-    });
-
-    muteBtn.addEventListener("click", () => {
-      if (audio.volume > 0) {
-        previousVolume = audio.volume * 100;
-        audio.volume = 0;
-        volumeSlider.value = 0;
-        volumeIcon.className = "fa-solid fa-volume-xmark";
-      } else {
-        const rest = previousVolume || 85;
-        audio.volume = rest / 100;
-        volumeSlider.value = rest;
-        volumeIcon.className = "fa-solid fa-volume-high";
-      }
     });
 
     speedSelect.addEventListener("change", () => { audio.playbackRate = Number(speedSelect.value); });
@@ -1316,68 +1346,56 @@
 
     searchInput.addEventListener("input", applySearchAndSort);
 
-    // Sidebar Nav Switching
-    function setView(mode, title) {
-      currentViewMode = mode;
-      viewTitle.textContent = title;
-      applySearchAndSort();
-    }
-
-    navHome.addEventListener("click", () => { setView('home', 'All Tracks'); setActiveNav(navHome, mobHomeBtn); });
-    navHistory.addEventListener("click", () => { setView('history', 'Recently Played'); setActiveNav(navHistory, mobHistoryBtn); });
-    navLocal.addEventListener("click", () => { showToast("Drag & drop audio files anywhere on the screen!"); });
-
-    mobHomeBtn.addEventListener("click", () => navHome.click());
-    mobHistoryBtn.addEventListener("click", () => navHistory.click());
-    mobPlaylistsBtn.addEventListener("click", () => {
-      const names = Object.keys(customPlaylists);
-      if (names.length > 0) {
-        customPlaylistsContainer.querySelector('button')?.click();
-      } else {
-        showToast("No playlists created yet");
-      }
-    });
-
-    function setActiveNav(desktopEl, mobileEl) {
-      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove("active"));
-      document.querySelectorAll('.mobile-nav-btn').forEach(el => el.classList.remove("active"));
-      if (desktopEl) desktopEl.classList.add("active");
-      if (mobileEl) mobileEl.classList.add("active");
-    }
-
-    sidebarThemeBtn.addEventListener("click", () => {
-      const isLight = document.body.classList.toggle("light");
-      localStorage.setItem(STORAGE_KEYS.theme, isLight ? "light" : "dark");
-    });
+    navHome.addEventListener("click", () => { currentViewMode = 'home'; viewTitle.textContent = 'All Tracks'; applySearchAndSort(); });
+    navHistory.addEventListener("click", () => { currentViewMode = 'history'; viewTitle.textContent = 'Recently Played'; applySearchAndSort(); });
 
     // Customization Modal Logic
     sidebarCustomizeBtn.addEventListener("click", () => {
+      bgThemeSelect.value = localStorage.getItem(STORAGE_KEYS.theme) || "dark";
+      fontSelect.value = localStorage.getItem(STORAGE_KEYS.font) || "'Inter', sans-serif";
+      cardCornerSelect.value = localStorage.getItem(STORAGE_KEYS.cardRadius) || "8px";
       accentColorPicker.value = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || "#1ed760";
       customizeModal.classList.add("show");
     });
+
     closeCustomizeBtn.addEventListener("click", () => customizeModal.classList.remove("show"));
+
+    function setPresetAccent(color) {
+      accentColorPicker.value = color;
+    }
+
     saveCustomizeBtn.addEventListener("click", () => {
-      const color = accentColorPicker.value;
-      document.documentElement.style.setProperty('--accent', color);
-      localStorage.setItem(STORAGE_KEYS.accent, color);
+      const selectedTheme = bgThemeSelect.value;
+      const selectedFont = fontSelect.value;
+      const selectedRadius = cardCornerSelect.value;
+      const selectedAccent = accentColorPicker.value;
+
+      document.body.className = selectedTheme === "dark" ? "" : selectedTheme;
+      document.documentElement.style.setProperty('--app-font', selectedFont);
+      document.documentElement.style.setProperty('--card-radius', selectedRadius);
+      document.documentElement.style.setProperty('--accent', selectedAccent);
+
+      localStorage.setItem(STORAGE_KEYS.theme, selectedTheme);
+      localStorage.setItem(STORAGE_KEYS.font, selectedFont);
+      localStorage.setItem(STORAGE_KEYS.cardRadius, selectedRadius);
+      localStorage.setItem(STORAGE_KEYS.accent, selectedAccent);
+
       customizeModal.classList.remove("show");
-      showToast("Theme customization saved!");
+      showToast("Customization saved!");
     });
+
     resetCustomizeBtn.addEventListener("click", () => {
+      document.body.className = "";
+      document.documentElement.style.setProperty('--app-font', "'Inter', sans-serif");
+      document.documentElement.style.setProperty('--card-radius', '8px');
       document.documentElement.style.setProperty('--accent', '#1ed760');
-      localStorage.removeItem(STORAGE_KEYS.accent);
+
+      [STORAGE_KEYS.theme, STORAGE_KEYS.font, STORAGE_KEYS.cardRadius, STORAGE_KEYS.accent].forEach(k => localStorage.removeItem(k));
       customizeModal.classList.remove("show");
-      showToast("Theme reset to default");
+      showToast("Reset to defaults");
     });
 
-    sidebarSettingsBtn.addEventListener("click", () => {
-      ownerInput.value = settings.owner;
-      repoInput.value = settings.repo;
-      branchInput.value = settings.branch;
-      folderInput.value = settings.folder;
-      settingsModal.classList.add("show");
-    });
-
+    sidebarSettingsBtn.addEventListener("click", () => settingsModal.classList.add("show"));
     closeSettingsBtn.addEventListener("click", () => settingsModal.classList.remove("show"));
     saveSettingsBtn.addEventListener("click", () => {
       settings = {
@@ -1391,56 +1409,17 @@
       loadPlaylistFromGitHub();
     });
 
-    // Sync Code Transfer & Clear Storage Feature
-    sidebarSyncBtn.addEventListener("click", () => {
-      syncCodeArea.value = "";
-      syncModal.classList.add("show");
-    });
+    sidebarSyncBtn.addEventListener("click", () => syncModal.classList.add("show"));
     closeSyncModalBtn.addEventListener("click", () => syncModal.classList.remove("show"));
-    mobSyncBtn.addEventListener("click", () => sidebarSyncBtn.click());
-
-    exportSyncBtn.addEventListener("click", () => {
-      const dataToExport = {
-        settings: loadSettings(),
-        renames: loadRenames(),
-        history: loadHistory(),
-        playlists: loadPlaylists()
-      };
-      const encoded = btoa(encodeURIComponent(JSON.stringify(dataToExport)));
-      syncCodeArea.value = encoded;
-      syncCodeArea.select();
-      showToast("Sync code generated & copied!");
-      navigator.clipboard.writeText(encoded);
-    });
-
-    importSyncBtn.addEventListener("click", () => {
-      try {
-        const code = syncCodeArea.value.trim();
-        if (!code) return;
-        const decoded = JSON.parse(decodeURIComponent(atob(code)));
-        if (decoded.settings) localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(decoded.settings));
-        if (decoded.renames) localStorage.setItem(STORAGE_KEYS.renames, JSON.stringify(decoded.renames));
-        if (decoded.history) localStorage.setItem(STORAGE_KEYS.history, JSON.stringify(decoded.history));
-        if (decoded.playlists) localStorage.setItem(STORAGE_KEYS.playlists, JSON.stringify(decoded.playlists));
-        showToast("Data imported successfully! Reloading...");
-        setTimeout(() => location.reload(), 1200);
-      } catch (e) {
-        showToast("Invalid sync code. Check text and try again.");
-      }
-    });
 
     clearDataBtn.addEventListener("click", () => {
-      if (confirm("Are you sure you want to clear all local data, playlists, and settings?")) {
+      if (confirm("Are you sure you want to clear all saved playlists and settings?")) {
         Object.values(STORAGE_KEYS).forEach(key => localStorage.removeItem(key));
-        showToast("Local data cleared! Reloading...");
-        setTimeout(() => location.reload(), 1000);
+        location.reload();
       }
     });
 
-    newPlaylistBtn.addEventListener("click", () => {
-      playlistNameInput.value = "";
-      playlistModal.classList.add("show");
-    });
+    newPlaylistBtn.addEventListener("click", () => playlistModal.classList.add("show"));
     closePlaylistModalBtn.addEventListener("click", () => playlistModal.classList.remove("show"));
     savePlaylistBtn.addEventListener("click", () => {
       const name = playlistNameInput.value.trim();
@@ -1448,7 +1427,6 @@
         customPlaylists[name] = [];
         savePlaylists();
         playlistModal.classList.remove("show");
-        showToast(`Playlist "${name}" created`);
       }
     });
 
@@ -1460,31 +1438,24 @@
           customPlaylists[playlistName].push(trackSelectedForPlaylist);
           savePlaylists();
           showToast(`Added to ${playlistName}`);
-        } else {
-          showToast(`Already in ${playlistName}`);
         }
         addToPlaylistModal.classList.remove("show");
       }
     });
 
-    window.addEventListener("keydown", (e) => {
-      if (["INPUT", "SELECT", "TEXTAREA"].includes(document.activeElement.tagName)) return;
-      if (e.code === "Space") { e.preventDefault(); togglePlay(); }
-      else if (e.code === "ArrowRight") nextTrack();
-      else if (e.code === "ArrowLeft") previousTrack();
-      else if (e.key.toLowerCase() === "r") repeatBtn.click();
-      else if (e.key.toLowerCase() === "s") shuffleBtn.click();
-      else if (e.key.toLowerCase() === "m") muteBtn.click();
-    });
+    // Apply saved customizations on load
+    const savedTheme = localStorage.getItem(STORAGE_KEYS.theme);
+    if (savedTheme && savedTheme !== "dark") document.body.classList.add(savedTheme);
 
-    // Initialization
-    if (localStorage.getItem(STORAGE_KEYS.theme) === "light") document.body.classList.add("light");
+    const savedFont = localStorage.getItem(STORAGE_KEYS.font);
+    if (savedFont) document.documentElement.style.setProperty('--app-font', savedFont);
+
+    const savedRadius = localStorage.getItem(STORAGE_KEYS.cardRadius);
+    if (savedRadius) document.documentElement.style.setProperty('--card-radius', savedRadius);
+
     const savedAccent = localStorage.getItem(STORAGE_KEYS.accent);
     if (savedAccent) document.documentElement.style.setProperty('--accent', savedAccent);
 
-    const savedVol = Number(localStorage.getItem(STORAGE_KEYS.volume) || 85);
-    volumeSlider.value = savedVol;
-    audio.volume = savedVol / 100;
     renderCustomPlaylistsNav();
     loadPlaylistFromGitHub();
   </script>
