@@ -1412,29 +1412,41 @@
     closeSyncModalBtn.addEventListener("click", () => syncModal.classList.remove("show"));
 
     exportSyncBtn.addEventListener("click", () => {
-      const dataToExport = {
-        settings: loadSettings(),
-        renames: loadRenames(),
-        history: loadHistory(),
-        playlists: loadPlaylists(),
-        theme: localStorage.getItem(STORAGE_KEYS.theme),
-        volume: localStorage.getItem(STORAGE_KEYS.volume),
-        accent: localStorage.getItem(STORAGE_KEYS.accent),
-        font: localStorage.getItem(STORAGE_KEYS.font),
-        cardRadius: localStorage.getItem(STORAGE_KEYS.cardRadius)
-      };
-      const encoded = btoa(encodeURIComponent(JSON.stringify(dataToExport)));
-      syncCodeArea.value = encoded;
-      syncCodeArea.select();
-      showToast("Sync code generated & copied!");
-      navigator.clipboard.writeText(encoded);
+      try {
+        const dataToExport = {
+          settings: loadSettings(),
+          renames: loadRenames(),
+          history: loadHistory(),
+          playlists: loadPlaylists(),
+          theme: localStorage.getItem(STORAGE_KEYS.theme),
+          volume: localStorage.getItem(STORAGE_KEYS.volume),
+          accent: localStorage.getItem(STORAGE_KEYS.accent),
+          font: localStorage.getItem(STORAGE_KEYS.font),
+          cardRadius: localStorage.getItem(STORAGE_KEYS.cardRadius)
+        };
+        const encoded = btoa(encodeURIComponent(JSON.stringify(dataToExport)));
+        syncCodeArea.value = encoded;
+        syncCodeArea.select();
+        
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(encoded).then(() => {
+            showToast("Sync code generated & copied!");
+          }).catch(() => {
+            showToast("Sync code generated!");
+          });
+        } else {
+          showToast("Sync code generated!");
+        }
+      } catch (err) {
+        console.error(err);
+        showToast("Error generating sync code");
+      }
     });
 
     importSyncBtn.addEventListener("click", () => {
       try {
         const rawCode = syncCodeArea.value;
         if (!rawCode) return;
-        // Clean any accidental whitespace or newlines introduced during copy/paste
         const code = rawCode.replace(/\s+/g, '');
         const decoded = JSON.parse(decodeURIComponent(atob(code)));
         
