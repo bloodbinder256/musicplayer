@@ -149,7 +149,6 @@
       overflow: hidden;
     }
 
-    /* Canvas visualizer layer inside cover */
     .cover canvas {
       position: absolute;
       top: 0;
@@ -158,7 +157,7 @@
       height: 100%;
       pointer-events: none;
       z-index: 1;
-      opacity: 0.6;
+      opacity: 0.7;
     }
 
     .cover::before {
@@ -478,7 +477,6 @@
       transform: translateX(-50%) translateY(0);
     }
 
-    /* Mobile Navigation Bar */
     .mobile-nav {
       display: none;
       position: fixed;
@@ -741,7 +739,6 @@
     let sortAscending = true;
     let previousVolume = 85;
 
-    // Web Audio Visualizer Setup
     let audioCtx, analyser, sourceNode;
     let isAudioInitialized = false;
 
@@ -757,37 +754,33 @@
         isAudioInitialized = true;
         visualize();
       } catch (e) {
-        console.error("Web Audio API error:", e);
+        console.warn("Visualizer fallback initialized due to CORS restriction:", e);
       }
     }
 
     function visualize() {
       requestAnimationFrame(visualize);
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+      canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+
       if (!audio.paused && analyser) {
         const bufferLength = analyser.frequencyBinCount;
         const dataArray = new Uint8Array(bufferLength);
         analyser.getByteFrequencyData(dataArray);
-
-        canvas.width = canvas.offsetWidth;
-        canvas.height = canvas.offsetHeight;
-
-        canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
 
         const barWidth = (canvas.width / bufferLength) * 2.5;
         let x = 0;
 
         for (let i = 0; i < bufferLength; i++) {
           const barHeight = (dataArray[i] / 255) * canvas.height;
-          canvasCtx.fillStyle = "rgba(255, 255, 255, 0.4)";
+          canvasCtx.fillStyle = "rgba(255, 255, 255, 0.5)";
           canvasCtx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
           x += barWidth + 1;
         }
-      } else {
-        canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
       }
     }
 
-    // Phone Mode Navigation
     navPlayerBtn.addEventListener("click", () => {
       appContainer.className = "app view-player";
       navPlayerBtn.classList.add("active");
@@ -916,7 +909,6 @@
       renderPlaylist();
     }
 
-    // Drag and Drop Reordering support
     let draggedFilename = null;
 
     function renderPlaylist() {
@@ -948,8 +940,7 @@
           </div>
         `;
 
-        // Drag events for reordering
-        li.addEventListener("dragstart", (e) => {
+        li.addEventListener("dragstart", () => {
           draggedFilename = track.filename;
           li.classList.add("dragging");
         });
@@ -974,7 +965,6 @@
             const [movedTrack] = tracks.splice(fromIdx, 1);
             tracks.splice(toIdx, 0, movedTrack);
             
-            // Keep current playing song index matched
             currentTrackIndex = tracks.findIndex(t => t.filename === tracks[currentTrackIndex]?.filename);
             applySearchAndSort();
             showToast("Playlist reordered");
@@ -1004,7 +994,7 @@
       const track = tracks[currentTrackIndex];
 
       audio.src = track.url;
-      track.playbackRate = speedSelect.value;
+      audio.playbackRate = Number(speedSelect.value);
       trackTitle.textContent = getDisplayTitle(track);
       trackMeta.innerHTML = `${track.filename} • <a href="${track.githubPage}" target="_blank" rel="noopener">GitHub</a>`;
       seekSlider.value = 0;
@@ -1149,9 +1139,7 @@
       }
     }
 
-    // Keyboard Shortcuts Support
     window.addEventListener("keydown", (e) => {
-      // Avoid hotkeys if user is actively typing in inputs or search bars
       if (["INPUT", "SELECT", "TEXTAREA"].includes(document.activeElement.tagName)) return;
 
       if (e.code === "Space") {
