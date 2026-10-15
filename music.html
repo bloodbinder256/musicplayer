@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Spotify Style GitHub Music Player Pro</title>
+  <title>Fayelist - Music Player</title>
 
   <!-- Libraries -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -85,9 +85,11 @@
       letter-spacing: -0.03em;
     }
 
-    .logo i {
-      color: var(--accent);
-      font-size: 24px;
+    .logo img {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
     }
 
     .nav-links {
@@ -150,7 +152,7 @@
       display: flex;
       flex-direction: column;
       gap: 4px;
-      max-height: 160px;
+      max-height: 150px;
       overflow-y: auto;
     }
 
@@ -245,7 +247,7 @@
     }
 
     .btn-accent:hover {
-      background: var(--accent-hover);
+      opacity: 0.9;
     }
 
     /* Song Grid View */
@@ -356,6 +358,24 @@
     .song-row.active {
       color: var(--accent);
       background: var(--panel);
+    }
+
+    /* Offline Screen */
+    .offline-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      text-align: center;
+      color: var(--muted);
+      gap: 16px;
+      padding: 40px;
+    }
+
+    .offline-screen i {
+      font-size: 48px;
+      color: var(--danger);
     }
 
     /* Persistent Bottom Player Bar */
@@ -622,7 +642,7 @@
     <!-- Desktop Sidebar Navigation -->
     <aside class="sidebar">
       <div class="logo">
-        <i class="fa-brands fa-spotify"></i> GitHubify
+        <img src="assets/fayelist.png" alt="Fayelist Logo"> Fayelist
       </div>
       <div class="nav-links">
         <button class="nav-item active" id="navHome"><i class="fa-solid fa-house"></i> Home Library</button>
@@ -637,13 +657,14 @@
       <div class="custom-playlists" id="customPlaylistsContainer"></div>
 
       <div class="sidebar-section">
+        <button class="nav-item" id="sidebarCustomizeBtn"><i class="fa-solid fa-palette"></i> Customization</button>
         <button class="nav-item" id="sidebarSyncBtn"><i class="fa-solid fa-qrcode"></i> Device Sync Code</button>
         <button class="nav-item" id="sidebarSettingsBtn"><i class="fa-solid fa-gear"></i> GitHub Setup</button>
         <button class="nav-item" id="sidebarThemeBtn"><i class="fa-solid fa-circle-half-stroke"></i> Toggle Theme</button>
       </div>
     </aside>
 
-    <!-- Main Content Viewport (Drop Zone Enabled) -->
+    <!-- Main Content Viewport -->
     <section class="main-viewport" id="dropZone">
       <div class="viewport-header">
         <div class="search-bar-wrap">
@@ -722,9 +743,20 @@
     </div>
   </div>
 
+  <div class="panel-modal" id="customizeModal">
+    <h3>Theme Customization</h3>
+    <label style="font-size: 13px; color: var(--muted); display: block; margin-bottom: 6px;">Accent Color</label>
+    <input type="color" id="accentColorPicker" value="#1ed760" style="height: 44px; padding: 4px; cursor: pointer;">
+    <div class="modal-actions">
+      <button class="btn" id="resetCustomizeBtn">Reset Default</button>
+      <button class="btn btn-accent" id="saveCustomizeBtn">Save Changes</button>
+      <button class="btn" id="closeCustomizeBtn">Close</button>
+    </div>
+  </div>
+
   <div class="panel-modal" id="syncModal">
     <h3>Transfer Data Between Devices</h3>
-    <p style="color:var(--muted); font-size:13px; margin-top:0;">Copy this sync code to another device or paste a code from another device to load your playlists & settings.</p>
+    <p style="color:var(--muted); font-size:13px; margin-top:0;">Copy this sync code or paste code from another device.</p>
     <textarea id="syncCodeArea" rows="4" placeholder="Export or paste sync code here..."></textarea>
     <div class="modal-actions">
       <button class="btn" id="exportSyncBtn">Copy Code</button>
@@ -764,12 +796,13 @@
 
     const AUDIO_EXTENSIONS = [".mp3", ".wav", ".ogg", ".flac", ".aac", ".m4a"];
     const STORAGE_KEYS = {
-      settings: "githubMusicPlayerSettings",
-      renames: "githubMusicPlayerRenames",
-      theme: "githubMusicPlayerTheme",
-      volume: "githubMusicPlayerVolume",
-      history: "githubMusicPlayerHistory",
-      playlists: "githubMusicPlayerCustomPlaylists"
+      settings: "fayelistSettings",
+      renames: "fayelistRenames",
+      theme: "fayelistTheme",
+      volume: "fayelistVolume",
+      history: "fayelistHistory",
+      playlists: "fayelistCustomPlaylists",
+      accent: "fayelistAccentColor"
     };
 
     const audio = document.getElementById("audio");
@@ -804,6 +837,13 @@
     const repoInput = document.getElementById("repoInput");
     const branchInput = document.getElementById("branchInput");
     const folderInput = document.getElementById("folderInput");
+
+    const customizeModal = document.getElementById("customizeModal");
+    const sidebarCustomizeBtn = document.getElementById("sidebarCustomizeBtn");
+    const closeCustomizeBtn = document.getElementById("closeCustomizeBtn");
+    const saveCustomizeBtn = document.getElementById("saveCustomizeBtn");
+    const resetCustomizeBtn = document.getElementById("resetCustomizeBtn");
+    const accentColorPicker = document.getElementById("accentColorPicker");
 
     const syncModal = document.getElementById("syncModal");
     const sidebarSyncBtn = document.getElementById("sidebarSyncBtn");
@@ -890,7 +930,13 @@
       setTimeout(() => toastEl.classList.remove("show"), 1800);
     }
 
+    // No Internet / Offline Handler & GitHub Loader
     async function loadPlaylistFromGitHub() {
+      if (!navigator.onLine) {
+        renderOfflineScreen("No internet connection detected. You can still play local dropped files or review your offline history!");
+        return;
+      }
+
       try {
         const response = await fetch(githubApiUrl());
         if (!response.ok) throw new Error("GitHub request failed");
@@ -908,9 +954,28 @@
         showToast(`${tracks.length} tracks loaded successfully`);
       } catch (error) {
         console.error(error);
-        contentContainer.innerHTML = `<div style="color:var(--muted); text-align:center; padding:40px;">Could not load files from GitHub. Check setup settings.</div>`;
+        renderOfflineScreen("Could not reach GitHub repository. Check your connection or repository settings.");
       }
     }
+
+    function renderOfflineScreen(message) {
+      contentContainer.innerHTML = `
+        <div class="offline-screen">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          <h3 style="margin:0; color:var(--text);">Offline Mode</h3>
+          <p style="max-width:320px; margin:0;">${message}</p>
+          <button class="btn btn-accent" onclick="loadPlaylistFromGitHub()" style="margin-top:10px;">Retry Connection</button>
+        </div>
+      `;
+    }
+
+    window.addEventListener('online', () => {
+      showToast("Back online! Refreshing tracks...");
+      loadPlaylistFromGitHub();
+    });
+    window.addEventListener('offline', () => {
+      renderOfflineScreen("You have gone offline. Check local files or playlists.");
+    });
 
     function renderCustomPlaylistsNav() {
       customPlaylistsContainer.innerHTML = "";
@@ -966,7 +1031,7 @@
       contentContainer.innerHTML = "";
 
       if (!filteredTracks.length) {
-        contentContainer.innerHTML = `<div style="color:var(--muted); text-align:center; padding:50px;">No songs to display. You can also drag & drop local audio files right here!</div>`;
+        contentContainer.innerHTML = `<div style="color:var(--muted); text-align:center; padding:50px;">No songs to display. Drag & drop audio files anywhere here!</div>`;
         return;
       }
 
@@ -1118,7 +1183,7 @@
       addToPlaylistModal.classList.add("show");
     }
 
-    // Fixed Local Drag and Drop Support
+    // Local Drag and Drop Support
     dropZone.addEventListener("dragover", (e) => e.preventDefault());
     dropZone.addEventListener("drop", (e) => {
       e.preventDefault();
@@ -1213,7 +1278,7 @@
 
     searchInput.addEventListener("input", applySearchAndSort);
 
-    // Sidebar & Mobile Nav Switching
+    // Sidebar Nav Switching
     function setView(mode, title) {
       currentViewMode = mode;
       viewTitle.textContent = title;
@@ -1222,9 +1287,7 @@
 
     navHome.addEventListener("click", () => { setView('home', 'All Tracks'); setActiveNav(navHome, mobHomeBtn); });
     navHistory.addEventListener("click", () => { setView('history', 'Recently Played'); setActiveNav(navHistory, mobHistoryBtn); });
-    navLocal.addEventListener("click", () => {
-      showToast("Drag & drop your audio files anywhere on the screen!");
-    });
+    navLocal.addEventListener("click", () => { showToast("Drag & drop audio files anywhere on the screen!"); });
 
     mobHomeBtn.addEventListener("click", () => navHome.click());
     mobHistoryBtn.addEventListener("click", () => navHistory.click());
@@ -1236,7 +1299,6 @@
         showToast("No playlists created yet");
       }
     });
-    mobSyncBtn.addEventListener("click", () => sidebarSyncBtn.click());
 
     function setActiveNav(desktopEl, mobileEl) {
       document.querySelectorAll('.nav-item').forEach(el => el.classList.remove("active"));
@@ -1248,6 +1310,26 @@
     sidebarThemeBtn.addEventListener("click", () => {
       const isLight = document.body.classList.toggle("light");
       localStorage.setItem(STORAGE_KEYS.theme, isLight ? "light" : "dark");
+    });
+
+    // Customization Modal Logic
+    sidebarCustomizeBtn.addEventListener("click", () => {
+      accentColorPicker.value = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || "#1ed760";
+      customizeModal.classList.add("show");
+    });
+    closeCustomizeBtn.addEventListener("click", () => customizeModal.classList.remove("show"));
+    saveCustomizeBtn.addEventListener("click", () => {
+      const color = accentColorPicker.value;
+      document.documentElement.style.setProperty('--accent', color);
+      localStorage.setItem(STORAGE_KEYS.accent, color);
+      customizeModal.classList.remove("show");
+      showToast("Theme customization saved!");
+    });
+    resetCustomizeBtn.addEventListener("click", () => {
+      document.documentElement.style.setProperty('--accent', '#1ed760');
+      localStorage.removeItem(STORAGE_KEYS.accent);
+      customizeModal.classList.remove("show");
+      showToast("Theme reset to default");
     });
 
     sidebarSettingsBtn.addEventListener("click", () => {
@@ -1277,6 +1359,7 @@
       syncModal.classList.add("show");
     });
     closeSyncModalBtn.addEventListener("click", () => syncModal.classList.remove("show"));
+    mobSyncBtn.addEventListener("click", () => sidebarSyncBtn.click());
 
     exportSyncBtn.addEventListener("click", () => {
       const dataToExport = {
@@ -1350,6 +1433,9 @@
 
     // Initialization
     if (localStorage.getItem(STORAGE_KEYS.theme) === "light") document.body.classList.add("light");
+    const savedAccent = localStorage.getItem(STORAGE_KEYS.accent);
+    if (savedAccent) document.documentElement.style.setProperty('--accent', savedAccent);
+
     const savedVol = Number(localStorage.getItem(STORAGE_KEYS.volume) || 85);
     volumeSlider.value = savedVol;
     audio.volume = savedVol / 100;
