@@ -86,10 +86,10 @@
     }
 
     .logo img {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      object-fit: cover;
+      width: 24px;
+      height: 24px;
+      object-fit: contain;
+      image-rendering: pixelated; /* Keeps small 15x15px icons crisp */
     }
 
     .nav-links {
@@ -642,7 +642,7 @@
     <!-- Desktop Sidebar Navigation -->
     <aside class="sidebar">
       <div class="logo">
-        <img src="assets/fayelist.png" alt="Fayelist Logo"> Fayelist
+        <img src="https://raw.githubusercontent.com/bloodbinder256/musicplayer/main/assets/fayelist.png" alt="Fayelist Logo"> Fayelist
       </div>
       <div class="nav-links">
         <button class="nav-item active" id="navHome"><i class="fa-solid fa-house"></i> Home Library</button>
