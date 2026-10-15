@@ -1411,6 +1411,51 @@
     sidebarSyncBtn.addEventListener("click", () => syncModal.classList.add("show"));
     closeSyncModalBtn.addEventListener("click", () => syncModal.classList.remove("show"));
 
+    exportSyncBtn.addEventListener("click", () => {
+      const dataToExport = {
+        settings: loadSettings(),
+        renames: loadRenames(),
+        history: loadHistory(),
+        playlists: loadPlaylists(),
+        theme: localStorage.getItem(STORAGE_KEYS.theme),
+        volume: localStorage.getItem(STORAGE_KEYS.volume),
+        accent: localStorage.getItem(STORAGE_KEYS.accent),
+        font: localStorage.getItem(STORAGE_KEYS.font),
+        cardRadius: localStorage.getItem(STORAGE_KEYS.cardRadius)
+      };
+      const encoded = btoa(encodeURIComponent(JSON.stringify(dataToExport)));
+      syncCodeArea.value = encoded;
+      syncCodeArea.select();
+      showToast("Sync code generated & copied!");
+      navigator.clipboard.writeText(encoded);
+    });
+
+    importSyncBtn.addEventListener("click", () => {
+      try {
+        const rawCode = syncCodeArea.value;
+        if (!rawCode) return;
+        // Clean any accidental whitespace or newlines introduced during copy/paste
+        const code = rawCode.replace(/\s+/g, '');
+        const decoded = JSON.parse(decodeURIComponent(atob(code)));
+        
+        if (decoded.settings) localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(decoded.settings));
+        if (decoded.renames) localStorage.setItem(STORAGE_KEYS.renames, JSON.stringify(decoded.renames));
+        if (decoded.history) localStorage.setItem(STORAGE_KEYS.history, JSON.stringify(decoded.history));
+        if (decoded.playlists) localStorage.setItem(STORAGE_KEYS.playlists, JSON.stringify(decoded.playlists));
+        if (decoded.theme) localStorage.setItem(STORAGE_KEYS.theme, decoded.theme);
+        if (decoded.volume) localStorage.setItem(STORAGE_KEYS.volume, decoded.volume);
+        if (decoded.accent) localStorage.setItem(STORAGE_KEYS.accent, decoded.accent);
+        if (decoded.font) localStorage.setItem(STORAGE_KEYS.font, decoded.font);
+        if (decoded.cardRadius) localStorage.setItem(STORAGE_KEYS.cardRadius, decoded.cardRadius);
+
+        showToast("Data imported successfully! Reloading...");
+        setTimeout(() => location.reload(), 1200);
+      } catch (e) {
+        console.error(e);
+        showToast("Invalid sync code. Check text and try again.");
+      }
+    });
+
     clearDataBtn.addEventListener("click", () => {
       if (confirm("Are you sure you want to clear all saved playlists and settings?")) {
         Object.values(STORAGE_KEYS).forEach(key => localStorage.removeItem(key));
