@@ -89,7 +89,7 @@
       width: 24px;
       height: 24px;
       object-fit: contain;
-      image-rendering: pixelated; /* Keeps small 15x15px icons crisp */
+      image-rendering: pixelated;
     }
 
     .nav-links {
@@ -248,6 +248,11 @@
 
     .btn-accent:hover {
       opacity: 0.9;
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: #fff;
     }
 
     /* Song Grid View */
@@ -556,6 +561,7 @@
       gap: 10px;
       justify-content: flex-end;
       margin-top: 16px;
+      flex-wrap: wrap;
     }
 
     .toast {
@@ -642,7 +648,7 @@
     <!-- Desktop Sidebar Navigation -->
     <aside class="sidebar">
       <div class="logo">
-        <img src="https://raw.githubusercontent.com/bloodbinder256/musicplayer/main/assets/fayelist.png" alt="Fayelist Logo"> 
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAPCAYAAAA71pVKAAAB90lEQVR4AWxSu6oiQRA9M+BjR/2BDczN/AMRE2FFAyMfYKKCmaAgmIiJIBqIsAiKiCCK4gPNjAyXNfJffKyKOjunYOTey22omequOlV1TreKb9ZsNtPn87kY/fF4rH+Thk9gAjubpYKf..." alt="Fayelist Logo"> Fayelist
       </div>
       <div class="nav-links">
         <button class="nav-item active" id="navHome"><i class="fa-solid fa-house"></i> Home Library</button>
@@ -755,10 +761,11 @@
   </div>
 
   <div class="panel-modal" id="syncModal">
-    <h3>Transfer Data Between Devices</h3>
-    <p style="color:var(--muted); font-size:13px; margin-top:0;">Copy this sync code or paste code from another device.</p>
+    <h3>Transfer & Manage Data</h3>
+    <p style="color:var(--muted); font-size:13px; margin-top:0;">Export/import your sync code or clear local storage cache.</p>
     <textarea id="syncCodeArea" rows="4" placeholder="Export or paste sync code here..."></textarea>
     <div class="modal-actions">
+      <button class="btn btn-danger" id="clearDataBtn">Clear All Local Data</button>
       <button class="btn" id="exportSyncBtn">Copy Code</button>
       <button class="btn btn-accent" id="importSyncBtn">Load Code</button>
       <button class="btn" id="closeSyncModalBtn">Close</button>
@@ -850,6 +857,7 @@
     const closeSyncModalBtn = document.getElementById("closeSyncModalBtn");
     const exportSyncBtn = document.getElementById("exportSyncBtn");
     const importSyncBtn = document.getElementById("importSyncBtn");
+    const clearDataBtn = document.getElementById("clearDataBtn");
     const syncCodeArea = document.getElementById("syncCodeArea");
     const mobSyncBtn = document.getElementById("mobSyncBtn");
 
@@ -875,6 +883,47 @@
     const mobPlaylistsBtn = document.getElementById("mobPlaylistsBtn");
     const mobHistoryBtn = document.getElementById("mobHistoryBtn");
 
+    // Safe Error-Resistant LocalStorage Parsers
+    function loadSettings() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEYS.settings) || "null");
+        return { ...DEFAULT_SETTINGS, ...(saved || {}) };
+      } catch (e) {
+        localStorage.removeItem(STORAGE_KEYS.settings);
+        return DEFAULT_SETTINGS;
+      }
+    }
+    function saveSettings() { localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(settings)); }
+    
+    function loadRenames() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEYS.renames) || "{}");
+      } catch (e) {
+        localStorage.removeItem(STORAGE_KEYS.renames);
+        return {};
+      }
+    }
+    
+    function loadHistory() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEYS.history) || "[]");
+      } catch (e) {
+        localStorage.removeItem(STORAGE_KEYS.history);
+        return [];
+      }
+    }
+    function saveHistory() { localStorage.setItem(STORAGE_KEYS.history, JSON.stringify(historyList)); }
+    
+    function loadPlaylists() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEYS.playlists) || "{}");
+      } catch (e) {
+        localStorage.removeItem(STORAGE_KEYS.playlists);
+        return {};
+      }
+    }
+    function savePlaylists() { localStorage.setItem(STORAGE_KEYS.playlists, JSON.stringify(customPlaylists)); renderCustomPlaylistsNav(); }
+
     let settings = loadSettings();
     let renames = loadRenames();
     let historyList = loadHistory();
@@ -890,17 +939,6 @@
     let activePlaylistName = null;
     let trackSelectedForPlaylist = null;
     let previousVolume = 85;
-
-    function loadSettings() {
-      const saved = JSON.parse(localStorage.getItem(STORAGE_KEYS.settings) || "null");
-      return { ...DEFAULT_SETTINGS, ...(saved || {}) };
-    }
-    function saveSettings() { localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(settings)); }
-    function loadRenames() { return JSON.parse(localStorage.getItem(STORAGE_KEYS.renames) || "{}"); }
-    function loadHistory() { return JSON.parse(localStorage.getItem(STORAGE_KEYS.history) || "[]"); }
-    function saveHistory() { localStorage.setItem(STORAGE_KEYS.history, JSON.stringify(historyList)); }
-    function loadPlaylists() { return JSON.parse(localStorage.getItem(STORAGE_KEYS.playlists) || "{}"); }
-    function savePlaylists() { localStorage.setItem(STORAGE_KEYS.playlists, JSON.stringify(customPlaylists)); renderCustomPlaylistsNav(); }
 
     function cleanFileName(name) {
       return decodeURIComponent(name).replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ").replace(/\s+/g, " ").trim();
@@ -1353,7 +1391,7 @@
       loadPlaylistFromGitHub();
     });
 
-    // Sync Code Transfer Feature
+    // Sync Code Transfer & Clear Storage Feature
     sidebarSyncBtn.addEventListener("click", () => {
       syncCodeArea.value = "";
       syncModal.classList.add("show");
@@ -1388,6 +1426,14 @@
         setTimeout(() => location.reload(), 1200);
       } catch (e) {
         showToast("Invalid sync code. Check text and try again.");
+      }
+    });
+
+    clearDataBtn.addEventListener("click", () => {
+      if (confirm("Are you sure you want to clear all local data, playlists, and settings?")) {
+        Object.values(STORAGE_KEYS).forEach(key => localStorage.removeItem(key));
+        showToast("Local data cleared! Reloading...");
+        setTimeout(() => location.reload(), 1000);
       }
     });
 
