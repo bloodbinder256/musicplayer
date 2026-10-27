@@ -90,7 +90,7 @@
       padding: 24px 16px;
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 16px;
       overflow-y: auto;
     }
 
@@ -114,7 +114,7 @@
     .nav-links {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 4px;
     }
 
     .nav-item {
@@ -128,7 +128,7 @@
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 14px;
       text-align: left;
       font-family: inherit;
       transition: color 0.2s, background 0.2s;
@@ -143,36 +143,36 @@
       color: var(--accent);
     }
 
-    .playlist-section-header {
+    .section-label {
       display: flex;
       justify-content: space-between;
       align-items: center;
       color: var(--muted);
-      font-size: 12px;
-      font-weight: 700;
+      font-size: 11px;
+      font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.08em;
       margin-top: 10px;
       padding: 0 12px;
     }
 
-    .playlist-section-header button {
+    .section-label button {
       background: none;
       border: none;
       color: var(--muted);
       cursor: pointer;
-      font-size: 14px;
+      font-size: 13px;
     }
 
-    .playlist-section-header button:hover {
+    .section-label button:hover {
       color: var(--text);
     }
 
-    .custom-playlists {
+    .category-nav-list, .custom-playlists {
       display: flex;
       flex-direction: column;
-      gap: 4px;
-      max-height: 150px;
+      gap: 2px;
+      max-height: 180px;
       overflow-y: auto;
     }
 
@@ -276,7 +276,49 @@
       color: #fff;
     }
 
-    /* Song Grid View */
+    /* Category Row Layouts (Spotify Style) */
+    .category-row-section {
+      margin-bottom: 32px;
+    }
+
+    .category-row-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 14px;
+    }
+
+    .category-row-title {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      text-transform: capitalize;
+    }
+
+    .see-all-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .see-all-btn:hover {
+      color: var(--text);
+      text-decoration: underline;
+    }
+
+    .category-scroll-container {
+      display: flex;
+      gap: 18px;
+      overflow-x: auto;
+      padding-bottom: 12px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--panel-hover) transparent;
+    }
+
+    /* Song Cards */
     .song-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -285,19 +327,23 @@
     }
 
     .song-card {
+      min-width: 170px;
+      max-width: 200px;
       background: var(--panel);
-      padding: 16px;
+      padding: 14px;
       border-radius: var(--card-radius);
       cursor: pointer;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
       transition: background 0.3s, transform 0.2s;
       position: relative;
+      flex-shrink: 0;
     }
 
     .song-card:hover {
       background: var(--panel-hover);
+      transform: translateY(-2px);
     }
 
     .song-card.active {
@@ -308,7 +354,7 @@
       width: 100%;
       aspect-ratio: 1;
       border-radius: calc(var(--card-radius) - 2px);
-      background: linear-gradient(135deg, #333, #111);
+      background: linear-gradient(135deg, #2a2a2a, #111);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -340,9 +386,9 @@
 
     .card-menu-btn {
       position: absolute;
-      top: 24px;
-      right: 24px;
-      background: rgba(0,0,0,0.6);
+      top: 20px;
+      right: 20px;
+      background: rgba(0,0,0,0.7);
       border: none;
       color: white;
       width: 32px;
@@ -352,6 +398,7 @@
       display: none;
       align-items: center;
       justify-content: center;
+      z-index: 5;
     }
 
     .song-card:hover .card-menu-btn {
@@ -367,7 +414,7 @@
 
     .song-row {
       display: grid;
-      grid-template-columns: 40px 1fr 1fr auto;
+      grid-template-columns: 40px 1fr 120px auto;
       align-items: center;
       padding: 10px 16px;
       border-radius: var(--card-radius);
@@ -404,7 +451,7 @@
       color: var(--danger);
     }
 
-    /* Persistent Bottom Player Bar */
+    /* Bottom Player Bar */
     .bottom-player {
       grid-column: 1 / -1;
       background: var(--bg);
@@ -452,6 +499,10 @@
     .mini-info .artist {
       font-size: 12px;
       color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 180px;
     }
 
     .player-center {
@@ -696,7 +747,7 @@
     <!-- Desktop Sidebar Navigation -->
     <aside class="sidebar">
       <div class="logo">
-        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAPCAYAAAA71pVKAAAB90lEQVR4AWxSu6oiQRA9M+BjR/2BDczN/AMRE2FFAyMfYKKCmaAgmIiJIBqIsAiKiCCK4gPNjAyXNfJffKyKOjunYOTey22omequOlV1TreKb9ZsNtPn87kY/fF4rH+Thk9gAjabjT4YDNDtdsXoTyYTMDYajT4VeYOXy6Xe7/fRarVwPB5xOp3E6J/PZzC2WCzwsYCAWbXX6+FyuaBWq6HdbksBE8izUqmE6/WK1WqF4XCok4aArVYrbrcb6vU6MpkMfvxOYb1eS+fpdIrC5S8ILhaLuN/vsFgsxEKlIJ1ORw5ZhNW1xz+4XC7prmka7lb1HX88HtLdoKGrxsLz+cTr9UIqlcJ2u4XW/AO32w1y9Xq9mP78xVGlu5lLnIxdKBTQaDRklEAgAI/HI7754VkikZAtc2OxmPgqO7IaORlCSOfD4QCHwyFms9nkjDFqwtsghqaSAzlXq1XkcjlR1O/3Y7/fi+12O0SjUeFcqVQkh4qzoRqPxxVybTabojavy+l0itKRSET+FI1CUm1OEAwGkc1mFeHMgN1uFzBF4si8Yypu7lmUb4F5vFaSFnAymVQ4GjuQU7lclo4ck0Xy+by8MMZJiV1hLAEbf7BAOBwGleR7/vq2GfP5fEin0wrzaW8wNwZ3hRqQUygUAo0+uzFmdmQu7T8AAAD//7Tc2/0AAAAGSURBVAMAxCNAX37r6eYAAAAASUVORK5CYII=" alt="Fayelist Logo"> Fayelist
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAPCAYAAAA71pVKAAAB90lEQVR4AWxSu6oiQRA9M+BjR/2BDczN/AMRE2FFAyMfYKKCmaAgmIiJIBqIsAiKiCCK4gPNjAyXNfJffKyKOjunYOTey22omequOlV1TreKb9ZsNtPn87kY/fF4rH+Thk9gAjabjT4YDNDtdsXoTyYTMDYajT4VeYOXy6Xe7/fRarVwPB5xOp3E6J/PZzC2WCzwsYCAWbXX6+FyuaBWq6HdbksBE8izUqdmE6/WK1WqF4XCok4aArVYrbrcb6vU6MpkMfvxOYb1eS+fpdIrC5S8ILhaLuN/vsFgsxEKlIJ1ORw5ZhNW1xz+4XC7prmka7lb1HX88HtLdoKGrxsLz+cTr9UIqlcJ2u4XW/AO32w1y9Xq9mP78xVGlu5lLnIxdKBTQaDRklEAgAI/HI7754VkikZAtc2OxmPgqO7IaORlCSOfD4QCHwyFms9nkjDFqwtsghqaSAzlXq1XkcjlR1O/3Y7/fi+12O0SjUeFcqVQkh4qzoRqPxxVybTabojavy+l0itKRSET+FI1CUm1OEAwGkc1mFeHMgN1uFzBF4si8Yypu7lmUb4F5vFaSFnAymVQ4GjuQU7lclo4ck0Xy+by8MMZJiV1hLAEbf7BAOBwGleR7/vq2GfP5fEin0wrzaW8wNwZ3hRqQUygUAo0+uzFmdmQu7T8AAAD//7Tc2/0AAAAGSURBVAMAxCNAX37r6eYAAAAASUVORK5CYII=" alt="Fayelist Logo"> Fayelist
       </div>
       <div class="nav-links">
         <button class="nav-item active" id="navHome"><i class="fa-solid fa-house"></i> Home Library</button>
@@ -704,7 +755,14 @@
         <button class="nav-item" id="navLocal"><i class="fa-solid fa-file-arrow-down"></i> Drop Audio Files Here</button>
       </div>
 
-      <div class="playlist-section-header">
+      <div class="section-label">
+        <span>Categories / Folders</span>
+      </div>
+      <div class="category-nav-list" id="categoryNavContainer">
+        <div style="color:var(--muted); font-size:12px; padding:4px 12px;">Loading folders...</div>
+      </div>
+
+      <div class="section-label">
         <span>Playlists</span>
         <button id="newPlaylistBtn" title="Create Playlist"><i class="fa-solid fa-plus"></i></button>
       </div>
@@ -722,7 +780,7 @@
       <div class="viewport-header">
         <div class="search-bar-wrap">
           <i class="fa-solid fa-magnifying-glass"></i>
-          <input id="searchInput" type="search" placeholder="Search songs, artists, or drop audio files...">
+          <input id="searchInput" type="search" placeholder="Search songs, podcasts, categories, artists...">
         </div>
         <div class="header-actions">
           <button class="btn" id="viewToggleBtn" title="Toggle Grid/List View"><i class="fa-solid fa-table-cells-large"></i></button>
@@ -730,7 +788,7 @@
         </div>
       </div>
 
-      <h2 id="viewTitle" style="margin-top:0; margin-bottom:16px; font-size:22px;">All Tracks</h2>
+      <h2 id="viewTitle" style="margin-top:0; margin-bottom:16px; font-size:22px;">Home</h2>
       <div id="contentContainer"></div>
     </section>
 
@@ -756,11 +814,11 @@
 
       <div class="player-center">
         <div class="player-controls">
-          <button class="control-btn" id="shuffleBtn" title="Shuffle (S)"><i class="fa-solid fa-shuffle"></i></button>
-          <button class="control-btn" id="prevBtn" title="Previous (Left Arrow)"><i class="fa-solid fa-backward-step"></i></button>
-          <button class="control-btn play-pause" id="playBtn" title="Play/Pause (Space)"><i class="fa-solid fa-play"></i></button>
-          <button class="control-btn" id="nextBtn" title="Next (Right Arrow)"><i class="fa-solid fa-forward-step"></i></button>
-          <button class="control-btn" id="repeatBtn" title="Repeat (R)"><i class="fa-solid fa-repeat"></i></button>
+          <button class="control-btn" id="shuffleBtn" title="Shuffle"><i class="fa-solid fa-shuffle"></i></button>
+          <button class="control-btn" id="prevBtn" title="Previous / Back"><i class="fa-solid fa-backward-step"></i></button>
+          <button class="control-btn play-pause" id="playBtn" title="Play/Pause"><i class="fa-solid fa-play"></i></button>
+          <button class="control-btn" id="nextBtn" title="Next"><i class="fa-solid fa-forward-step"></i></button>
+          <button class="control-btn" id="repeatBtn" title="Repeat"><i class="fa-solid fa-repeat"></i></button>
         </div>
         <div class="playback-bar-row">
           <span id="currentTime">0:00</span>
@@ -835,7 +893,7 @@
     <input id="ownerInput" placeholder="GitHub username">
     <input id="repoInput" placeholder="Repository name">
     <input id="branchInput" placeholder="Branch (e.g. main)">
-    <input id="folderInput" placeholder="Music folder name">
+    <input id="folderInput" placeholder="Root folder name (or leave empty)">
     <div class="modal-actions">
       <button class="btn" id="closeSettingsBtn">Cancel</button>
       <button class="btn btn-accent" id="saveSettingsBtn">Save & Reload</button>
@@ -956,6 +1014,7 @@
     const savePlaylistBtn = document.getElementById("savePlaylistBtn");
     const playlistNameInput = document.getElementById("playlistNameInput");
     const customPlaylistsContainer = document.getElementById("customPlaylistsContainer");
+    const categoryNavContainer = document.getElementById("categoryNavContainer");
 
     const addToPlaylistModal = document.getElementById("addToPlaylistModal");
     const closeAddModalBtn = document.getElementById("closeAddModalBtn");
@@ -971,7 +1030,6 @@
     const mobPlaylistsBtn = document.getElementById("mobPlaylistsBtn");
     const mobHistoryBtn = document.getElementById("mobHistoryBtn");
 
-    // Safe LocalStorage Parsers
     function loadSettings() {
       try {
         const saved = JSON.parse(localStorage.getItem(STORAGE_KEYS.settings) || "null");
@@ -1004,14 +1062,20 @@
     let renames = loadRenames();
     let historyList = loadHistory();
     let customPlaylists = loadPlaylists();
+    
     let tracks = [];
+    let categories = {}; // Category Name -> Array of tracks
+    let playedHistory = []; // Track navigation stack for working Back button
+    let isInternalTrackChange = false;
+
     let filteredTracks = [];
     let currentTrackIndex = 0;
     let isShuffle = false;
     let isRepeat = false;
     let sortAscending = true;
     let isGridView = true;
-    let currentViewMode = 'home';
+    let currentViewMode = 'home'; // 'home', 'history', 'category_[name]', 'playlist_[name]'
+    let activeCategoryName = null;
     let activePlaylistName = null;
     let trackSelectedForPlaylist = null;
     let previousVolume = 85;
@@ -1021,15 +1085,6 @@
     }
     function getDisplayTitle(track) { return renames[track.filename] || track.originalTitle; }
     function isAudioFile(filename) { return AUDIO_EXTENSIONS.some(ext => filename.toLowerCase().endsWith(ext)); }
-
-    function githubApiUrl() {
-      const folder = settings.folder.split("/").map(encodeURIComponent).join("/");
-      return `https://api.github.com/repos/${settings.owner}/${settings.repo}/contents/${folder}?ref=${settings.branch}`;
-    }
-    function rawGithubUrl(filename) {
-      const encodedFolder = settings.folder.split("/").map(encodeURIComponent).join("/");
-      return `https://raw.githubusercontent.com/${settings.owner}/${settings.repo}/${settings.branch}/${encodedFolder}/${encodeURIComponent(filename)}`;
-    }
 
     function formatTime(seconds) {
       if (!Number.isFinite(seconds)) return "0:00";
@@ -1044,30 +1099,80 @@
       setTimeout(() => toastEl.classList.remove("show"), 1800);
     }
 
-    async function loadPlaylistFromGitHub() {
+    // Dynamic GitHub Subfolder & Directory Scanning
+    async function fetchDirectoryContents(path = "") {
+      const cleanPath = path.replace(/^\/|\/$/g, '');
+      const pathSegment = cleanPath ? `/${cleanPath.split('/').map(encodeURIComponent).join('/')}` : "";
+      const url = `https://api.github.com/repos/${settings.owner}/${settings.repo}/contents${pathSegment}?ref=${settings.branch}`;
+      
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`GitHub request failed for path: ${path}`);
+      return await response.json();
+    }
+
+    async function loadRepositoryContent() {
       if (!navigator.onLine) {
         renderOfflineScreen("No internet connection detected.");
         return;
       }
 
+      contentContainer.innerHTML = `<div style="color:var(--muted); text-align:center; padding:50px;">Scanning folders and audio files...</div>`;
+
       try {
-        const response = await fetch(githubApiUrl());
-        if (!response.ok) throw new Error("GitHub request failed");
-        const files = await response.json();
-        tracks = files
-          .filter(file => file.type === "file" && isAudioFile(file.name))
-          .map(file => ({
-            originalTitle: cleanFileName(file.name),
-            filename: file.name,
-            url: rawGithubUrl(file.name),
-            githubPage: file.html_url
-          }));
+        tracks = [];
+        categories = {};
+
+        const rootItems = await fetchDirectoryContents(settings.folder);
+        
+        let fileQueue = [];
+        
+        for (const item of rootItems) {
+          if (item.type === "file" && isAudioFile(item.name)) {
+            const categoryName = settings.folder ? settings.folder.split('/').pop() : "General";
+            fileQueue.push({ item, category: categoryName });
+          } else if (item.type === "dir") {
+            // Found a folder (e.g. podcasts, audiobooks, rock, etc.)
+            const categoryName = item.name;
+            try {
+              const subItems = await fetchDirectoryContents(item.path);
+              for (const subItem of subItems) {
+                if (subItem.type === "file" && isAudioFile(subItem.name)) {
+                  fileQueue.push({ item: subItem, category: categoryName });
+                }
+              }
+            } catch (err) {
+              console.warn(`Could not read directory ${item.path}`, err);
+            }
+          }
+        }
+
+        // Parse collected items
+        fileQueue.forEach(({ item, category }) => {
+          const track = {
+            originalTitle: cleanFileName(item.name),
+            filename: item.name,
+            url: item.download_url || `https://raw.githubusercontent.com/${settings.owner}/${settings.repo}/${settings.branch}/${encodeURIComponent(item.path)}`,
+            category: category,
+            path: item.path,
+            githubPage: item.html_url
+          };
+
+          tracks.push(track);
+          if (!categories[category]) categories[category] = [];
+          categories[category].push(track);
+        });
+
+        renderCategorySidebarNav();
         applySearchAndSort();
-        if (tracks.length > 0 && !audio.src) loadTrack(0);
-        showToast(`${tracks.length} tracks loaded successfully`);
+
+        if (tracks.length > 0 && !audio.src) {
+          loadTrack(0, false);
+        }
+
+        showToast(`Loaded ${tracks.length} tracks across ${Object.keys(categories).length} folder(s)`);
       } catch (error) {
-        console.error(error);
-        renderOfflineScreen("Could not reach GitHub repository.");
+        console.error("Repository load error:", error);
+        renderOfflineScreen("Could not fetch repository contents. Check GitHub settings.");
       }
     }
 
@@ -1077,9 +1182,44 @@
           <i class="fa-solid fa-triangle-exclamation"></i>
           <h3 style="margin:0; color:var(--text);">Offline Mode</h3>
           <p style="max-width:320px; margin:0;">${message}</p>
-          <button class="btn btn-accent" onclick="loadPlaylistFromGitHub()" style="margin-top:10px;">Retry Connection</button>
+          <button class="btn btn-accent" onclick="loadRepositoryContent()" style="margin-top:10px;">Retry Connection</button>
         </div>
       `;
+    }
+
+    function renderCategorySidebarNav() {
+      categoryNavContainer.innerHTML = "";
+      const catNames = Object.keys(categories);
+      if (catNames.length === 0) {
+        categoryNavContainer.innerHTML = `<div style="color:var(--muted); font-size:12px; padding:4px 12px;">No folders found</div>`;
+        return;
+      }
+
+      catNames.forEach(cat => {
+        const btn = document.createElement("button");
+        btn.className = "nav-item";
+        if (currentViewMode === `category_${cat}`) btn.classList.add("active");
+        btn.style.fontSize = "13px";
+        btn.style.padding = "8px 12px";
+
+        // Assign icons based on folder name
+        let iconClass = "fa-folder";
+        const lowerCat = cat.toLowerCase();
+        if (lowerCat.includes("podcast")) iconClass = "fa-podcast";
+        else if (lowerCat.includes("book") || lowerCat.includes("audiobook")) iconClass = "fa-book-open";
+        else if (lowerCat.includes("single") || lowerCat.includes("song")) iconClass = "fa-music";
+
+        btn.innerHTML = `<i class="fa-solid ${iconClass}"></i> ${cat}`;
+        btn.addEventListener("click", () => {
+          currentViewMode = `category_${cat}`;
+          activeCategoryName = cat;
+          viewTitle.textContent = cat;
+          document.querySelectorAll('.nav-item').forEach(el => el.classList.remove("active"));
+          btn.classList.add("active");
+          applySearchAndSort();
+        });
+        categoryNavContainer.appendChild(btn);
+      });
     }
 
     function renderCustomPlaylistsNav() {
@@ -1109,19 +1249,28 @@
     }
 
     function applySearchAndSort() {
+      const query = searchInput.value.trim().toLowerCase();
+
+      if (currentViewMode === 'home' && !query) {
+        renderSpotifyStyleHomeRows();
+        return;
+      }
+
       let sourceTracks = tracks;
       if (currentViewMode === 'history') {
         sourceTracks = historyList;
+      } else if (currentViewMode.startsWith('category_')) {
+        sourceTracks = categories[activeCategoryName] || [];
       } else if (currentViewMode.startsWith('playlist_')) {
         const filenames = customPlaylists[activePlaylistName] || [];
         sourceTracks = tracks.filter(t => filenames.includes(t.filename));
       }
 
-      const query = searchInput.value.trim().toLowerCase();
       filteredTracks = sourceTracks.filter(track => {
         const title = getDisplayTitle(track).toLowerCase();
         const file = track.filename.toLowerCase();
-        return title.includes(query) || file.includes(query);
+        const cat = (track.category || "").toLowerCase();
+        return title.includes(query) || file.includes(query) || cat.includes(query);
       });
 
       filteredTracks.sort((a, b) => {
@@ -1130,6 +1279,79 @@
       });
 
       renderContent();
+    }
+
+    // Spotify-Style Home View Row Layout
+    function renderSpotifyStyleHomeRows() {
+      contentContainer.innerHTML = "";
+      const catNames = Object.keys(categories);
+
+      if (catNames.length === 0 && tracks.length === 0) {
+        contentContainer.innerHTML = `<div style="color:var(--muted); text-align:center; padding:50px;">No songs found. Drag & drop audio files or folders anywhere!</div>`;
+        return;
+      }
+
+      catNames.forEach(cat => {
+        const rowTracks = categories[cat];
+        if (!rowTracks || rowTracks.length === 0) return;
+
+        const section = document.createElement("div");
+        section.className = "category-row-section";
+
+        section.innerHTML = `
+          <div class="category-row-header">
+            <div class="category-row-title">${cat}</div>
+            <button class="see-all-btn">See all (${rowTracks.length})</button>
+          </div>
+          <div class="category-scroll-container"></div>
+        `;
+
+        section.querySelector('.see-all-btn').addEventListener('click', () => {
+          currentViewMode = `category_${cat}`;
+          activeCategoryName = cat;
+          viewTitle.textContent = cat;
+          document.querySelectorAll('.nav-item').forEach(el => el.classList.remove("active"));
+          applySearchAndSort();
+        });
+
+        const scrollContainer = section.querySelector('.category-scroll-container');
+
+        rowTracks.forEach(track => {
+          const realIndex = tracks.findIndex(t => t.filename === track.filename && t.path === track.path);
+          const card = document.createElement("div");
+          card.className = "song-card";
+          if (realIndex === currentTrackIndex && realIndex !== -1) card.classList.add("active");
+
+          let categoryIcon = "fa-music";
+          if (cat.toLowerCase().includes("podcast")) categoryIcon = "fa-podcast";
+          else if (cat.toLowerCase().includes("book")) categoryIcon = "fa-book-open";
+
+          card.innerHTML = `
+            <div class="card-cover">
+              <i class="fa-solid ${categoryIcon}"></i>
+            </div>
+            <button class="card-menu-btn" title="Add to Playlist"><i class="fa-solid fa-plus"></i></button>
+            <div class="card-title">${getDisplayTitle(track)}</div>
+            <div class="card-subtitle">${track.category || "Audio"}</div>
+          `;
+
+          card.querySelector('.card-menu-btn').addEventListener("click", (e) => {
+            e.stopPropagation();
+            openAddToPlaylistModal(track.filename);
+          });
+
+          card.addEventListener("click", () => {
+            if (realIndex !== -1) {
+              loadTrack(realIndex);
+              playTrack();
+            }
+          });
+
+          scrollContainer.appendChild(card);
+        });
+
+        contentContainer.appendChild(section);
+      });
     }
 
     function renderContent() {
@@ -1144,10 +1366,10 @@
         const grid = document.createElement("div");
         grid.className = "song-grid";
         filteredTracks.forEach((track) => {
-          const realIndex = tracks.findIndex(item => item.filename === track.filename);
+          const realIndex = tracks.findIndex(item => item.filename === track.filename && item.path === track.path);
           const card = document.createElement("div");
           card.className = "song-card";
-          if (realIndex === currentTrackIndex && currentViewMode === 'home') card.classList.add("active");
+          if (realIndex === currentTrackIndex && realIndex !== -1) card.classList.add("active");
 
           card.innerHTML = `
             <div class="card-cover">
@@ -1155,7 +1377,7 @@
             </div>
             <button class="card-menu-btn" title="Add to Playlist"><i class="fa-solid fa-plus"></i></button>
             <div class="card-title">${getDisplayTitle(track)}</div>
-            <div class="card-subtitle">${track.filename}</div>
+            <div class="card-subtitle">${track.category || track.filename}</div>
           `;
 
           card.querySelector('.card-menu-btn').addEventListener("click", (e) => {
@@ -1176,15 +1398,15 @@
         const list = document.createElement("div");
         list.className = "song-list-view";
         filteredTracks.forEach((track, idx) => {
-          const realIndex = tracks.findIndex(item => item.filename === track.filename);
+          const realIndex = tracks.findIndex(item => item.filename === track.filename && item.path === track.path);
           const row = document.createElement("div");
           row.className = "song-row";
-          if (realIndex === currentTrackIndex && currentViewMode === 'home') row.classList.add("active");
+          if (realIndex === currentTrackIndex && realIndex !== -1) row.classList.add("active");
 
           row.innerHTML = `
             <div>${idx + 1}</div>
             <div style="font-weight:700;">${getDisplayTitle(track)}</div>
-            <div style="color:var(--muted); font-size:13px;">${track.filename}</div>
+            <div style="color:var(--muted); font-size:13px;">${track.category || "Track"}</div>
             <button class="btn" style="padding:4px 8px; font-size:12px;" title="Add to Playlist"><i class="fa-solid fa-plus"></i></button>
           `;
 
@@ -1205,26 +1427,36 @@
       }
     }
 
-    function loadTrack(index) {
+    function loadTrack(index, recordHistory = true) {
       if (!tracks.length) return;
+
+      // Push previous index to stack for Back button functionality
+      if (recordHistory && !isInternalTrackChange && tracks[currentTrackIndex]) {
+        playedHistory.push(currentTrackIndex);
+      }
+
       currentTrackIndex = (index + tracks.length) % tracks.length;
       const track = tracks[currentTrackIndex];
 
       audio.src = track.url;
       audio.playbackRate = Number(speedSelect.value);
       trackTitle.textContent = getDisplayTitle(track);
-      trackArtist.textContent = track.filename;
+      trackArtist.textContent = `${track.category || 'General'} • ${track.filename}`;
       seekSlider.value = 0;
       currentTimeEl.textContent = "0:00";
       durationEl.textContent = "0:00";
 
-      if (!historyList.some(h => h.filename === track.filename)) {
+      if (!historyList.some(h => h.filename === track.filename && h.path === track.path)) {
         historyList.unshift(track);
-        if (historyList.length > 20) historyList.pop();
+        if (historyList.length > 30) historyList.pop();
         saveHistory();
       }
 
-      renderContent();
+      if (currentViewMode === 'home' && !searchInput.value.trim()) {
+        renderSpotifyStyleHomeRows();
+      } else {
+        renderContent();
+      }
     }
 
     function playTrack() {
@@ -1248,9 +1480,25 @@
       playTrack();
     }
 
+    // Working Back Button Logic
     function previousTrack() {
-      loadTrack(currentTrackIndex - 1);
-      playTrack();
+      // If song is currently playing for more than 3 seconds, restart it
+      if (audio.currentTime > 3) {
+        audio.currentTime = 0;
+        return;
+      }
+
+      // Pop last song from playback history stack
+      if (playedHistory.length > 0) {
+        const lastIndex = playedHistory.pop();
+        isInternalTrackChange = true;
+        loadTrack(lastIndex, false);
+        isInternalTrackChange = false;
+        playTrack();
+      } else {
+        loadTrack(currentTrackIndex - 1);
+        playTrack();
+      }
     }
 
     function openAddToPlaylistModal(filename) {
@@ -1270,27 +1518,68 @@
       addToPlaylistModal.classList.add("show");
     }
 
-    // Drag & Drop
+    // Drag & Drop Handling for Files and Folders
     dropZone.addEventListener("dragover", (e) => e.preventDefault());
-    dropZone.addEventListener("drop", (e) => {
+    dropZone.addEventListener("drop", async (e) => {
       e.preventDefault();
-      const files = Array.from(e.dataTransfer.files).filter(file => isAudioFile(file.name));
-      if (files.length === 0) return;
+      const items = e.dataTransfer.items;
+      if (!items) return;
 
-      const newTracks = files.map(file => ({
-        originalTitle: cleanFileName(file.name),
-        filename: file.name,
-        url: URL.createObjectURL(file),
-        githubPage: "#"
-      }));
+      let addedCount = 0;
 
-      tracks.push(...newTracks);
-      currentViewMode = 'home';
-      viewTitle.textContent = "All Tracks (Includes Local)";
-      applySearchAndSort();
-      showToast(`Added ${files.length} local file(s)`);
-      if (audio.src === "") loadTrack(tracks.length - newTracks.length);
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i].webkitGetAsEntry ? items[i].webkitGetAsEntry() : null;
+        if (item) {
+          addedCount += await processDroppedEntry(item);
+        }
+      }
+
+      if (addedCount > 0) {
+        renderCategorySidebarNav();
+        currentViewMode = 'home';
+        viewTitle.textContent = "Home Library";
+        applySearchAndSort();
+        showToast(`Added ${addedCount} local track(s)`);
+        if (!audio.src && tracks.length > 0) loadTrack(0);
+      }
     });
+
+    async function processDroppedEntry(entry, folderName = "Local Files") {
+      let count = 0;
+      if (entry.isFile) {
+        return new Promise((resolve) => {
+          entry.file((file) => {
+            if (isAudioFile(file.name)) {
+              const track = {
+                originalTitle: cleanFileName(file.name),
+                filename: file.name,
+                url: URL.createObjectURL(file),
+                category: folderName,
+                path: file.name,
+                githubPage: "#"
+              };
+              tracks.push(track);
+              if (!categories[folderName]) categories[folderName] = [];
+              categories[folderName].push(track);
+              resolve(1);
+            } else {
+              resolve(0);
+            }
+          });
+        });
+      } else if (entry.isDirectory) {
+        const dirReader = entry.createReader();
+        return new Promise((resolve) => {
+          dirReader.readEntries(async (entries) => {
+            for (const subEntry of entries) {
+              count += await processDroppedEntry(subEntry, entry.name);
+            }
+            resolve(count);
+          });
+        });
+      }
+      return count;
+    }
 
     // Event Handlers
     playBtn.addEventListener("click", togglePlay);
@@ -1334,7 +1623,7 @@
     viewToggleBtn.addEventListener("click", () => {
       isGridView = !isGridView;
       viewToggleBtn.innerHTML = isGridView ? `<i class="fa-solid fa-table-cells-large"></i>` : `<i class="fa-solid fa-bars"></i>`;
-      renderContent();
+      applySearchAndSort();
     });
 
     sortBtn.addEventListener("click", () => {
@@ -1345,8 +1634,21 @@
 
     searchInput.addEventListener("input", applySearchAndSort);
 
-    navHome.addEventListener("click", () => { currentViewMode = 'home'; viewTitle.textContent = 'All Tracks'; applySearchAndSort(); });
-    navHistory.addEventListener("click", () => { currentViewMode = 'history'; viewTitle.textContent = 'Recently Played'; applySearchAndSort(); });
+    navHome.addEventListener("click", () => {
+      currentViewMode = 'home';
+      viewTitle.textContent = 'Home Library';
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove("active"));
+      navHome.classList.add("active");
+      applySearchAndSort();
+    });
+
+    navHistory.addEventListener("click", () => {
+      currentViewMode = 'history';
+      viewTitle.textContent = 'Recently Played';
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove("active"));
+      navHistory.classList.add("active");
+      applySearchAndSort();
+    });
 
     // Customization Modal Logic
     sidebarCustomizeBtn.addEventListener("click", () => {
@@ -1401,11 +1703,11 @@
         owner: ownerInput.value.trim() || DEFAULT_SETTINGS.owner,
         repo: repoInput.value.trim() || DEFAULT_SETTINGS.repo,
         branch: branchInput.value.trim() || DEFAULT_SETTINGS.branch,
-        folder: folderInput.value.trim() || DEFAULT_SETTINGS.folder
+        folder: folderInput.value.trim()
       };
       saveSettings();
       settingsModal.classList.remove("show");
-      loadPlaylistFromGitHub();
+      loadRepositoryContent();
     });
 
     sidebarSyncBtn.addEventListener("click", () => syncModal.classList.add("show"));
@@ -1513,7 +1815,7 @@
     if (savedAccent) document.documentElement.style.setProperty('--accent', savedAccent);
 
     renderCustomPlaylistsNav();
-    loadPlaylistFromGitHub();
+    loadRepositoryContent();
   </script>
 </body>
 </html>
