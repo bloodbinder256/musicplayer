@@ -734,23 +734,36 @@
       color: var(--accent);
     }
 
-    /* EQ Vertical Slider Container & Sizing Fixes */
-    .eq-slider-container {
+    /* Clean Custom Equalizer Styling */
+    .eq-modal-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      align-items: center;
+      justify-items: center;
+      margin: 20px 0;
+    }
+
+    .eq-slider-wrapper {
       height: 160px;
-      width: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 10px 0;
+      position: relative;
+      width: 40px;
     }
 
     .eq-vertical-slider {
+      writing-mode: bt-lr;
       -webkit-appearance: slider-vertical;
       appearance: slider-vertical;
       width: 24px;
       height: 140px;
-      cursor: pointer;
+      background: #333;
+      outline: none;
+      border-radius: 4px;
       accent-color: var(--accent);
+      cursor: pointer;
     }
 
     @media (max-width: 768px) {
@@ -957,38 +970,38 @@
       <option value="custom">Custom</option>
     </select>
 
-    <div class="grid grid-cols-5 gap-2 text-center my-4 items-center justify-items-center">
+    <div class="eq-modal-grid">
       <div class="flex flex-col items-center">
         <div class="text-xs text-gray-400 font-bold mb-1">60Hz</div>
-        <div class="eq-slider-container">
+        <div class="eq-slider-wrapper">
           <input type="range" id="eqBand0" min="-12" max="12" value="0" class="eq-vertical-slider">
         </div>
         <div class="text-xs font-mono mt-1" id="eqVal0">0dB</div>
       </div>
       <div class="flex flex-col items-center">
         <div class="text-xs text-gray-400 font-bold mb-1">230Hz</div>
-        <div class="eq-slider-container">
+        <div class="eq-slider-wrapper">
           <input type="range" id="eqBand1" min="-12" max="12" value="0" class="eq-vertical-slider">
         </div>
         <div class="text-xs font-mono mt-1" id="eqVal1">0dB</div>
       </div>
       <div class="flex flex-col items-center">
         <div class="text-xs text-gray-400 font-bold mb-1">910Hz</div>
-        <div class="eq-slider-container">
+        <div class="eq-slider-wrapper">
           <input type="range" id="eqBand2" min="-12" max="12" value="0" class="eq-vertical-slider">
         </div>
         <div class="text-xs font-mono mt-1" id="eqVal2">0dB</div>
       </div>
       <div class="flex flex-col items-center">
         <div class="text-xs text-gray-400 font-bold mb-1">4kHz</div>
-        <div class="eq-slider-container">
+        <div class="eq-slider-wrapper">
           <input type="range" id="eqBand3" min="-12" max="12" value="0" class="eq-vertical-slider">
         </div>
         <div class="text-xs font-mono mt-1" id="eqVal3">0dB</div>
       </div>
       <div class="flex flex-col items-center">
         <div class="text-xs text-gray-400 font-bold mb-1">14kHz</div>
-        <div class="eq-slider-container">
+        <div class="eq-slider-wrapper">
           <input type="range" id="eqBand4" min="-12" max="12" value="0" class="eq-vertical-slider">
         </div>
         <div class="text-xs font-mono mt-1" id="eqVal4">0dB</div>
