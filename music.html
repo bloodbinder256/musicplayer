@@ -734,6 +734,25 @@
       color: var(--accent);
     }
 
+    /* EQ Vertical Slider Container & Sizing Fixes */
+    .eq-slider-container {
+      height: 160px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 0;
+    }
+
+    .eq-vertical-slider {
+      -webkit-appearance: slider-vertical;
+      appearance: slider-vertical;
+      width: 24px;
+      height: 140px;
+      cursor: pointer;
+      accent-color: var(--accent);
+    }
+
     @media (max-width: 768px) {
       .app-layout {
         grid-template-columns: 1fr;
@@ -916,7 +935,7 @@
 
   <!-- Audio Equalizer Modal -->
   <div class="panel-modal" id="eqModal">
-    <div class="flex justify-between items-center mb-3">
+    <div class="flex justify-between items-center mb-4">
       <h3 style="margin:0;">5-Band Graphic Equalizer</h3>
       <label class="inline-flex items-center cursor-pointer m-0">
         <input type="checkbox" id="eqBypassToggle" class="sr-only peer" checked>
@@ -938,30 +957,40 @@
       <option value="custom">Custom</option>
     </select>
 
-    <div class="grid grid-cols-5 gap-3 text-center my-4">
-      <div>
+    <div class="grid grid-cols-5 gap-2 text-center my-4 items-center justify-items-center">
+      <div class="flex flex-col items-center">
         <div class="text-xs text-gray-400 font-bold mb-1">60Hz</div>
-        <input type="range" id="eqBand0" min="-12" max="12" value="0" class="h-28 [writing-mode:vertical-lr] [direction:rtl] mx-auto">
+        <div class="eq-slider-container">
+          <input type="range" id="eqBand0" min="-12" max="12" value="0" class="eq-vertical-slider">
+        </div>
         <div class="text-xs font-mono mt-1" id="eqVal0">0dB</div>
       </div>
-      <div>
+      <div class="flex flex-col items-center">
         <div class="text-xs text-gray-400 font-bold mb-1">230Hz</div>
-        <input type="range" id="eqBand1" min="-12" max="12" value="0" class="h-28 [writing-mode:vertical-lr] [direction:rtl] mx-auto">
+        <div class="eq-slider-container">
+          <input type="range" id="eqBand1" min="-12" max="12" value="0" class="eq-vertical-slider">
+        </div>
         <div class="text-xs font-mono mt-1" id="eqVal1">0dB</div>
       </div>
-      <div>
+      <div class="flex flex-col items-center">
         <div class="text-xs text-gray-400 font-bold mb-1">910Hz</div>
-        <input type="range" id="eqBand2" min="-12" max="12" value="0" class="h-28 [writing-mode:vertical-lr] [direction:rtl] mx-auto">
+        <div class="eq-slider-container">
+          <input type="range" id="eqBand2" min="-12" max="12" value="0" class="eq-vertical-slider">
+        </div>
         <div class="text-xs font-mono mt-1" id="eqVal2">0dB</div>
       </div>
-      <div>
+      <div class="flex flex-col items-center">
         <div class="text-xs text-gray-400 font-bold mb-1">4kHz</div>
-        <input type="range" id="eqBand3" min="-12" max="12" value="0" class="h-28 [writing-mode:vertical-lr] [direction:rtl] mx-auto">
+        <div class="eq-slider-container">
+          <input type="range" id="eqBand3" min="-12" max="12" value="0" class="eq-vertical-slider">
+        </div>
         <div class="text-xs font-mono mt-1" id="eqVal3">0dB</div>
       </div>
-      <div>
+      <div class="flex flex-col items-center">
         <div class="text-xs text-gray-400 font-bold mb-1">14kHz</div>
-        <input type="range" id="eqBand4" min="-12" max="12" value="0" class="h-28 [writing-mode:vertical-lr] [direction:rtl] mx-auto">
+        <div class="eq-slider-container">
+          <input type="range" id="eqBand4" min="-12" max="12" value="0" class="eq-vertical-slider">
+        </div>
         <div class="text-xs font-mono mt-1" id="eqVal4">0dB</div>
       </div>
     </div>
@@ -1322,7 +1351,6 @@
               localImages[cleanFileName(item.name).toLowerCase()] = item.download_url;
             }
           } else if (item.type === "dir") {
-            // Recursively dive into subfolders (e.g. root/podcasts/tech-talks)
             await recursiveScanGitHub(item.path, item.name);
           }
         }
@@ -1365,7 +1393,6 @@
               localImages[cleanFileName(item.name).toLowerCase()] = item.download_url;
             }
           } else if (item.type === "dir") {
-            // Recursively scan subfolders (like podcasts folder)
             await recursiveScanGitHub(item.path, item.name);
           }
         }
