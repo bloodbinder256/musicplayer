@@ -763,7 +763,7 @@
     <!-- Desktop Sidebar Navigation -->
     <aside class="sidebar">
       <div class="logo cursor-pointer flex items-center gap-2 text-lg font-black tracking-tight" id="appLogo">
-        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAPCAYAAAA71pVKAAAB90lEQVR4AWxSu6oiQRA9M+BjR/2BDczN/AMRE2FFAyMfYKKCmaAgmIiJIBqIsAiKiCCK4gPNjAyXNfJffKyKOjunYOTey22omequOlV1TreKb9ZsNtPn87kY/fF4rH+Thk9gAjabjT4YDNDtdsXoTyYTMDYajT4VeYOXy6Xe7/fRarVwPB5xOp3E6J/PZzC2WCzwsYCAWbXX6+FyuaBWq6HdbksBE8izUqdmE6/WK1WqF4XCok4aArVYrbrcb6vU6MpkMfvxOYb1eS+fpdIrC5S8ILhaLuN/vsFgsxEKlIJ1ORw5ZhNW1xz+4XC7prmka7lb1HX88HtLdoKGrxsLz+cTr9UIqlcJ2u4XW/AO32w1y9Xq9mP78xVGlu5lLnIxdKBTQaDRklEAgAI/HI7754VkikZAtc2OxmPgqO7IaORlCSOfD4QCHwyFms9nkjDFqwtsghqaSAzlXq1XkcjlR1O/3Y7/fi+12O0SjUeFcqVQkh4qzoRqPxxVybTabojavy+l0itKRSET+FI1CUm1OEAwGkc1mFeHMgN1uFzBF4si8Yypu7lmUb4F5vFaSFnAymVQ4GjuQU7lclo4ck0Xy+by8MMZJiV1hLAEbf7BAOBwGleR7/vq2GfP5fEin0wrzaW8wNwZ3hRqQUygUAo0+uzFmdmQu7T8AAAD//7Tc2/0AAAAGSURBVAMAxCNAX37r6eYAAAAASUVORK5CYII=" alt="Fayelist Logo" class="w-6 h-6 image-render-pixelated"> Fayelist
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAPCAYAAAA71pVKAAAB90lEQVR4AWxSu6oiQRA9M+BjR/2BDczN/AMRE2FFAyMfYKKCmaAgmIiJIBqIsAiKiCCK4gPNjAyXNfJffKyKOjunYOTey22omequOlV1TreKb9ZsNtPn87kY/fF4rH+Thk9gAjabjT4YDNDtdsXoTyYTMDYajT4VeYOXy6Xe7/fRarVwPB5xOp3E6J/PZzC2WCzwsYCAWbXX6+FyuaBWq6HdbksBE8izUqdmE6/WK1WqF4XCok4aArVYrbrcb6vU6MpkMfvxOYb1eS+fpdIrC5S8ILhaLuN/vsFgsxEKlIJ1ORw5ZhNW1xz+4XC7promka7lb1HX88HtLdoKGrxsLz+cTr9UIqlcJ2u4XW/AO32w1y9Xq9mP78xVGlu5lLnIxdKBTQaDRklEAgAI/HI7754VkikZAtc2OxmPkgqO7IaORlCSOfD4QCHwyFms9nkjDFqwtsghqaSAzlXq1XkcjlR1O/3Y7/fi+12O0SjUeFcqVQkh4qzoRqPxxVybTabojavy+l0itKRSET+FI1CUm1OEAwGkc1mFeHMgN1uFzBF4si8Yypu7lmUb4F5vFaSFnAymVQ4GjuQU7lclo4ck0Xy+by8MMZJiV1hLAEbf7BAOBwGleR7/vq2GfP5fEin0wrzaW8wNwZ3hRqQSygUAo0+uzFmdmQu7T8AAAD//7Tc2/0AAAAGSURAMAxCNAX37r6eYAAAAASUVORK5CYII=" alt="Fayelist Logo" class="w-6 h-6 image-render-pixelated"> Fayelist
       </div>
 
       <div class="nav-links">
@@ -1252,7 +1252,7 @@
       setTimeout(() => toastEl.classList.remove("show"), 1800);
     }
 
-    // Audio Equalizer Setup
+    // Audio Equalizer Setup (Fixed Node Graph Connection)
     function initEqualizer() {
       if (audioCtx) return;
       try {
@@ -1269,11 +1269,13 @@
           return filter;
         });
 
-        sourceNode.connect(eqFilters[0]);
-        for (let i = 0; i < eqFilters.length - 1; i++) {
-          eqFilters[i].connect(eqFilters[i + 1]);
-        }
-        eqFilters[eqFilters.length - 1].connect(audioCtx.destination);
+        // Wire: source -> filter0 -> filter1 -> ... -> destination
+        let currentNode = sourceNode;
+        eqFilters.forEach(filter => {
+          currentNode.connect(filter);
+          currentNode = filter;
+        });
+        currentNode.connect(audioCtx.destination);
 
         const savedGains = JSON.parse(localStorage.getItem(STORAGE_KEYS.eqGains) || "[0,0,0,0,0]");
         savedGains.forEach((g, idx) => {
@@ -1288,7 +1290,7 @@
       }
     }
 
-    // Dynamic GitHub API Scanning
+    // Dynamic GitHub API Recursive Subfolder Scanning
     async function fetchDirectoryContents(path = "") {
       const cleanPath = path.replace(/^\/|\/$/g, '');
       const pathSegment = cleanPath ? `/${cleanPath.split('/').map(encodeURIComponent).join('/')}` : "";
@@ -1299,13 +1301,43 @@
       return await response.json();
     }
 
+    async function recursiveScanGitHub(path, categoryName) {
+      try {
+        const items = await fetchDirectoryContents(path);
+        for (const item of items) {
+          if (item.type === "file") {
+            if (isAudioFile(item.name)) {
+              const track = {
+                originalTitle: cleanFileName(item.name),
+                filename: item.name,
+                url: item.download_url || `https://raw.githubusercontent.com/${settings.owner}/${settings.repo}/${settings.branch}/${encodeURIComponent(item.path)}`,
+                category: categoryName,
+                path: item.path,
+                coverUrl: localImages[cleanFileName(item.name).toLowerCase()] || null
+              };
+              tracks.push(track);
+              if (!categories[categoryName]) categories[categoryName] = [];
+              categories[categoryName].push(track);
+            } else if (isImageFile(item.name)) {
+              localImages[cleanFileName(item.name).toLowerCase()] = item.download_url;
+            }
+          } else if (item.type === "dir") {
+            // Recursively dive into subfolders (e.g. root/podcasts/tech-talks)
+            await recursiveScanGitHub(item.path, item.name);
+          }
+        }
+      } catch (err) {
+        console.warn(`Could not scan path: ${path}`, err);
+      }
+    }
+
     async function loadRepositoryContent() {
       if (!navigator.onLine) {
         renderOfflineScreen("No internet connection detected.");
         return;
       }
 
-      contentContainer.innerHTML = `<div style="color:var(--muted); text-align:center; padding:50px;">Scanning folders, audio tracks, and artwork...</div>`;
+      contentContainer.innerHTML = `<div style="color:var(--muted); text-align:center; padding:50px;">Scanning folders, subfolders, and audio tracks...</div>`;
 
       try {
         tracks = [];
@@ -1313,48 +1345,30 @@
         localImages = {};
 
         const rootItems = await fetchDirectoryContents(settings.folder);
-        let fileQueue = [];
 
         for (const item of rootItems) {
           if (item.type === "file") {
             if (isAudioFile(item.name)) {
-              fileQueue.push({ item, category: settings.folder ? settings.folder.split('/').pop() : "General" });
+              const defaultCat = settings.folder ? settings.folder.split('/').pop() : "General";
+              const track = {
+                originalTitle: cleanFileName(item.name),
+                filename: item.name,
+                url: item.download_url || `https://raw.githubusercontent.com/${settings.owner}/${settings.repo}/${settings.branch}/${encodeURIComponent(item.path)}`,
+                category: defaultCat,
+                path: item.path,
+                coverUrl: null
+              };
+              tracks.push(track);
+              if (!categories[defaultCat]) categories[defaultCat] = [];
+              categories[defaultCat].push(track);
             } else if (isImageFile(item.name)) {
               localImages[cleanFileName(item.name).toLowerCase()] = item.download_url;
             }
           } else if (item.type === "dir") {
-            const categoryName = item.name;
-            try {
-              const subItems = await fetchDirectoryContents(item.path);
-              for (const subItem of subItems) {
-                if (subItem.type === "file") {
-                  if (isAudioFile(subItem.name)) {
-                    fileQueue.push({ item: subItem, category: categoryName });
-                  } else if (isImageFile(subItem.name)) {
-                    localImages[cleanFileName(subItem.name).toLowerCase()] = subItem.download_url;
-                  }
-                }
-              }
-            } catch (err) {
-              console.warn(`Could not read ${item.path}`, err);
-            }
+            // Recursively scan subfolders (like podcasts folder)
+            await recursiveScanGitHub(item.path, item.name);
           }
         }
-
-        fileQueue.forEach(({ item, category }) => {
-          const track = {
-            originalTitle: cleanFileName(item.name),
-            filename: item.name,
-            url: item.download_url || `https://raw.githubusercontent.com/${settings.owner}/${settings.repo}/${settings.branch}/${encodeURIComponent(item.path)}`,
-            category: category,
-            path: item.path,
-            coverUrl: localImages[cleanFileName(item.name).toLowerCase()] || null
-          };
-
-          tracks.push(track);
-          if (!categories[category]) categories[category] = [];
-          categories[category].push(track);
-        });
 
         renderCategorySidebarNav();
         applySearchAndSort();
@@ -1736,7 +1750,7 @@
       addToPlaylistModal.classList.add("show");
     }
 
-    // Drag & Drop
+    // Recursive Drag & Drop Local Subfolders Handler
     dropZone.addEventListener("dragover", (e) => e.preventDefault());
     dropZone.addEventListener("drop", async (e) => {
       e.preventDefault();
@@ -1746,7 +1760,7 @@
       let addedCount = 0;
       for (let i = 0; i < items.length; i++) {
         const item = items[i].webkitGetAsEntry ? items[i].webkitGetAsEntry() : null;
-        if (item) addedCount += await processDroppedEntry(item);
+        if (item) addedCount += await processDroppedEntry(item, item.name);
       }
 
       if (addedCount > 0) {
@@ -1809,7 +1823,6 @@
     let konamiIndex = 0;
 
     window.addEventListener("keydown", (e) => {
-      // Hotkeys Keyboard Shortcuts Handler
       if (["INPUT", "TEXTAREA", "SELECT"].includes(document.activeElement.tagName)) return;
 
       if (e.key === KONAMI_CODE[konamiIndex] || e.key.toLowerCase() === KONAMI_CODE[konamiIndex]) {
@@ -1896,7 +1909,6 @@
       renderConfetti();
     }
 
-    // Logo Click Easter Egg
     let logoClicks = 0;
     appLogo.addEventListener("click", () => {
       logoClicks++;
@@ -1907,13 +1919,11 @@
       }
     });
 
-    // Mini Cover Vinyl Spin Easter Egg
     miniCover.addEventListener("dblclick", () => {
       miniCover.classList.toggle("spinning");
       showToast(miniCover.classList.contains("spinning") ? "💿 Vinyl Spin Activated!" : "Vinyl Stopped");
     });
 
-    // Event Handlers
     playBtn.addEventListener("click", togglePlay);
     nextBtn.addEventListener("click", nextTrack);
     prevBtn.addEventListener("click", previousTrack);
@@ -1984,7 +1994,6 @@
       applySearchAndSort();
     });
 
-    // Customization & Themes Modal Logic
     const openCustomizeModal = () => {
       bgThemeSelect.value = localStorage.getItem(STORAGE_KEYS.theme) || "dark";
       fontSelect.value = localStorage.getItem(STORAGE_KEYS.font) || "'Inter', sans-serif";
@@ -2031,7 +2040,6 @@
       showToast("Reset to default styles");
     });
 
-    // Audio Equalizer Modal Controls
     const openEqModal = () => { initEqualizer(); eqModal.classList.add("show"); };
     sidebarEqBtn.addEventListener("click", openEqModal);
     eqHeaderBtn.addEventListener("click", openEqModal);
@@ -2082,13 +2090,11 @@
       localStorage.setItem(STORAGE_KEYS.eqGains, JSON.stringify(gains));
     }
 
-    // Hotkey Legends Modal Controls
     const openHotkeysModal = () => hotkeysModal.classList.add("show");
     sidebarHotkeysBtn.addEventListener("click", openHotkeysModal);
     hotkeysHeaderBtn.addEventListener("click", openHotkeysModal);
     closeHotkeysBtn.addEventListener("click", () => hotkeysModal.classList.remove("show"));
 
-    // Modals
     sidebarSettingsBtn.addEventListener("click", () => settingsModal.classList.add("show"));
     closeSettingsBtn.addEventListener("click", () => settingsModal.classList.remove("show"));
     saveSettingsBtn.addEventListener("click", () => {
@@ -2198,7 +2204,6 @@
       disclaimerModal.classList.add("show");
     }
 
-    // Apply saved customizations on initial load
     const savedTheme = localStorage.getItem(STORAGE_KEYS.theme);
     if (savedTheme && savedTheme !== "dark") document.body.classList.add(savedTheme);
 
